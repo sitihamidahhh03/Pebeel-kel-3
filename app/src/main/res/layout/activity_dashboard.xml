@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F9F5EB"> <!-- Background Putih Utama -->
+
+    <!-- 1. PANGGIL HEADER -->
+    <include layout="@layout/layout_header" />
+
+    <!-- Konten-->
+    <!-- CARD STATUS KELEMBABAN -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:cardBackgroundColor="#EBD5AB"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <!-- Bagian Kiri: Teks -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status:"
+                    android:textColor="#1B211A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Kering"
+                    android:textColor="#1B211A"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Bagian Kanan: Lingkaran Progres -->
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentEnd="true">
+
+                <!-- Lingkaran Background (Abu-abu Muda/Putih) -->
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="100"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressDrawable="@drawable/circle_background" />
+
+                <!-- Lingkaran Progres (Hitam) -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="43"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressDrawable="@drawable/circle_progress" />
+
+                <!-- Teks Persentase di Tengah -->
+                <TextView
+                    android:id="@+id/tvPercentage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="43%"
+                    android:textColor="#1B211A"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- CARD TOMBOL SIRAM -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        app:cardBackgroundColor="#EBD5AB"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="Siram Cabai"
+                android:textColor="#1B211A"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Tombol Switch (Saklar) -->
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchSiram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:thumbTint="#628141"
+                app:trackTint="#8BAE66" />
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- 3. PANGGIL FOOTER -->
+    <include layout="@layout/layout_footer" />
+
+</LinearLayout>
+
