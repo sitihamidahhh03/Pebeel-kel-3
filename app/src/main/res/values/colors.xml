@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="syam_green_dark">#0F785D</color>
+    <color name="syam_green_medium">#15A07E</color>
+    <color name="syam_green_light">#78E8C0</color>
+    <color name="wireframe_header_bg">#E0E0E0</color>
+    <color name="wireframe_content_bg">#EEEEEE</color>
+    <color name="wireframe_text_hint">#808080</color>
+
+    <!-- Missing colors needed for drawables -->
+    <color name="palette_google_red">#EA4335</color>
+    <color name="palette_button_teal">#008080</color>
+    <color name="palette_header_dark">#0F785D</color>
 </resources>

@@ -9,46 +9,52 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // Inisialisasi variabel UI
     private EditText etEmail, etPassword;
     private Button btnLogin, btnGoogleLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        try {
+            setContentView(R.layout.activity_login);
 
-        // Menghubungkan variabel dengan ID di XML
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
+            etEmail = findViewById(R.id.etEmail);
+            etPassword = findViewById(R.id.etPassword);
+            btnLogin = findViewById(R.id.btnLogin);
+            btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
 
-        // Logika Tombol Login Biasa
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handleLogin();
+            if (btnLogin != null) {
+                btnLogin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        handleLogin();
+                    }
+                });
             }
-        });
 
-        // Logika Tombol Google (Placeholder)
-        btnGoogleLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Fitur Google Login segera hadir!", Toast.LENGTH_SHORT).show();
+            if (btnGoogleLogin != null) {
+                btnGoogleLogin.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(LoginActivity.this, "Fitur Google Login segera hadir!", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error saat memuat layout: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private void handleLogin() {
+        if (etEmail == null || etPassword == null) return;
+        
         String email = etEmail.getText().toString();
         String password = etPassword.getText().toString();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Mohon isi semua field", Toast.LENGTH_SHORT).show();
         } else {
-            // Proses login autentikasi nantinya di sini
             Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
         }
     }
