@@ -1,47 +1,54 @@
 package com.example.monika;
 
 import android.os.Bundle;
-import android.widget.TextView; // Wajib import ini
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
-// 1. IMPORT Manager dari folder ui
+import com.example.monika.konten_dashboard.ClockManager;
+import com.example.monika.konten_dashboard.MonitoringManager;
+import com.example.monika.konten_dashboard.WateringManager;
 import com.example.monika.ui.FooterManager;
 import com.example.monika.ui.HeaderManager;
-import com.example.monika.konten_dashboard.ClockManager; // Import ClockManager yang baru dibuat
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private ClockManager clockManager; // Simpan di variabel agar bisa dihentikan nanti
+    private ClockManager clockManager;
+    private MonitoringManager monitoringManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Pastikan layout yang dipanggil benar
         setContentView(R.layout.activity_dashboard);
 
-        // 2. AKTIFKAN HEADER
+        // 1. Header & Footer
         new HeaderManager(this);
-
-        // 3. AKTIFKAN FOOTER
         FooterManager footer = new FooterManager(this);
-        // Set Indikator HOME aktif saat pertama kali buka
         footer.setActiveMenu(R.id.indicator_home);
 
-        // 4. AKTIFKAN CLOCK (JAM & TANGGAL OTOMATIS)
-        // Pastikan ID tvTime dan tvDate sudah ada di activity_dashboard.xml
+        // 2. Jam & Tanggal
         TextView tvTime = findViewById(R.id.tvTime);
         TextView tvDate = findViewById(R.id.tvDate);
-
-        // Hidupkan mesin jam
         clockManager = new ClockManager(tvTime, tvDate);
-    }
 
-    // PENTING: Matikan mesin jam saat Activity dihancurkan/ditutup
+        // 3. Monitoring (10 Detik)
+        monitoringManager = new MonitoringManager(this);
+
+        // 4. Switch Siram
+        SwitchCompat switchSiram = findViewById(R.id.switchSiram);
+        if (switchSiram != null) {
+            new WateringManager(this, switchSiram);
+        }
+    } // <--- TUTUP ONCREATE DI SINI
+
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() { // <--- ONDESTROY BERDIRI SENDIRI DI LUAR
         super.onDestroy();
         if (clockManager != null) {
             clockManager.stopClock();
         }
-    }
-}
+        if (monitoringManager != null) {
+            monitoringManager.stopMonitoring();
+        }
+    } // <--- TUTUP ONDESTROY
+} // <--- TUTUP CLASS UTAMA

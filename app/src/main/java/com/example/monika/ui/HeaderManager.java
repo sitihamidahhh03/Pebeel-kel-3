@@ -1,4 +1,4 @@
-package com.example.monika.ui; // Sesuaikan dengan nama package kamu
+package com.example.monika.ui;
 
 import android.app.Activity;
 import android.view.View;
@@ -31,12 +31,6 @@ public class HeaderManager {
                 public void onClick(View v) {
                     // Menampilkan pesan sementara
                     Toast.makeText(activity, "Membuka Profil Pengguna...", Toast.LENGTH_SHORT).show();
-
-                    /*
-                       Nanti di sini kamu bisa tambah kode pindah halaman:
-                       Intent intent = new Intent(activity, ProfileActivity.class);
-                       activity.startActivity(intent);
-                    */
                 }
             });
         }
@@ -53,7 +47,7 @@ public class HeaderManager {
         }
     }
 
-    // Fungsi tambahan jika kamu ingin mengubah judul secara dinamis dari Java
+    // Fungsi tambahan jika ingin mengubah judul secara dinamis dari Java
     public void setHeaderTitle(String title) {
         if (tvLogoApp != null) {
             tvLogoApp.setText(title);
