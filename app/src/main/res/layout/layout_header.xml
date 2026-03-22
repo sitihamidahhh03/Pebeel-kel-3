@@ -3,23 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#1B211A"
-    android:orientation="horizontal"
+    android:background="#1A3A5F" android:orientation="horizontal"
     android:padding="20dp"
-    android:gravity="center_vertical">
-
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Logo Aplikasi"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_account_circle"
-        app:tint="#FFFFFF" />
-</LinearLayout>
+    android:gravity="center_vertical"
+    android:elevation="4dp"> <TextView
+    android:id="@+id/tvLogoApp"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:text="Logo Aplikasi"
+    android:textColor="#FFFFFF"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    android:letterSpacing="0.05" /> <ImageView
+    android:id="@+id/ivProfile"
+    android:layout_width="38dp"
+    android:layout_height="38dp"
+    android:src="@drawable/ic_account_circle"
+    app:tint="#FFFFFF"
+    android:alpha="0.9" /> </LinearLayout>

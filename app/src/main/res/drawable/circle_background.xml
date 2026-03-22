@@ -4,5 +4,5 @@
     android:shape="ring"
     android:thicknessRatio="10"
     android:useLevel="false">
-    <solid android:color="#FFFFFF" /> <!-- Warna dasar lingkaran -->
+    <solid android:color="#E8F5E9" /> <!-- Warna dasar lingkaran -->
 </shape>
