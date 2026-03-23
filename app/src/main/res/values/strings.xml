@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">MoNiKa</string>
+    <string name="alarm_pengingat">Alarm Pengingat</string>
+    <string name="msg_siram_tanaman">Hai, user! Sudah saatnya menyiram tanaman kamu. Yuk, siram!</string>
+    <string name="one_minute_ago">1 menit yang lalu</string>
+    <string name="kelembaban_rendah">Kelembaban Rendah</string>
+    <string name="msg_saran_siram">Disarankan menyiram tanaman agar tetap sehat</string>
+    <string name="logo_aplikasi">Logo Aplikasi</string>
+    <string name="saran_tindakan">Saran Tindakan</string>
+    <string name="siram_tanaman">Siram tanaman</string>
+    <string name="kelembaban_tinggi">Kelembaban Tinggi</string>
+    <string name="msg_kelembaban_tinggi">Kelembaban tanah terlalu tinggi. Tunda penyiraman sementara.</string>
+    <string name="tunda_penyiraman">Tunda Penyiraman</string>
+    <string name="saatnya_menyiram">Saatnya Menyiram</string>
+    <string name="msg_saatnya_menyiram">Saatnya menyiram tanaman!\nKelembaban tanah rendah, segera siram tanaman untuk menjaga kelembaban.</string>
+    <string name="oke">Oke</string>
 </resources>
