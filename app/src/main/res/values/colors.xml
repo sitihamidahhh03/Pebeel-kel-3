@@ -3,15 +3,16 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
 
-    <color name="syam_green_dark">#0F785D</color>
-    <color name="syam_green_medium">#15A07E</color>
-    <color name="syam_green_light">#78E8C0</color>
-    <color name="wireframe_header_bg">#E0E0E0</color>
-    <color name="wireframe_content_bg">#EEEEEE</color>
-    <color name="wireframe_text_hint">#808080</color>
+    <!-- Warna Utama dari Gambar Referensi -->
+    <color name="syam_green_dark">#3E4E35</color> <!-- Hijau gelap di header/footer -->
+    <color name="syam_green_medium">#8BA870</color> <!-- Hijau sedang untuk teks tanggal -->
+    <color name="syam_green_light">#EAF2E1</color> <!-- Hijau sangat muda untuk background layar -->
 
-    <!-- Missing colors needed for drawables -->
+    <color name="wireframe_text_hint">#808080</color>
     <color name="palette_google_red">#EA4335</color>
+
+    <!-- Menambahkan kembali warna yang dibutuhkan oleh file drawable lain agar tidak error -->
     <color name="palette_button_teal">#008080</color>
-    <color name="palette_header_dark">#0F785D</color>
+    <color name="wireframe_content_bg">@color/syam_green_light</color>
+    <color name="palette_header_dark">@color/syam_green_dark</color>
 </resources>
