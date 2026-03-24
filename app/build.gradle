@@ -4,16 +4,14 @@ plugins {
 
 android {
     namespace 'com.example.monika'
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+
+    // Diperlukan compileSdk 36 karena versi library (seperti androidx.activity) yang digunakan sangat baru
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.example.monika"
         minSdk 26
-        targetSdk 36
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -26,6 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11

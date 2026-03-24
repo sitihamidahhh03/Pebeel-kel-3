@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Warna Utama dari Gambar Referensi -->
+    <color name="syam_green_dark">#3E4E35</color> <!-- Hijau gelap di header/footer -->
+    <color name="syam_green_medium">#8BA870</color> <!-- Hijau sedang untuk teks tanggal -->
+    <color name="syam_green_light">#EAF2E1</color> <!-- Hijau sangat muda untuk background layar -->
+
+    <color name="wireframe_text_hint">#808080</color>
+    <color name="palette_google_red">#EA4335</color>
+
+    <!-- Menambahkan kembali warna yang dibutuhkan oleh file drawable lain agar tidak error -->
+    <color name="palette_button_teal">#008080</color>
+    <color name="wireframe_content_bg">@color/syam_green_light</color>
+    <color name="palette_header_dark">@color/syam_green_dark</color>
 </resources>

@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MoNiKa</string>
+    <string name="logo_text">Logo</string>
+    <string name="login_title">Login</string>
+    <string name="login_subtitle">Silakan masuk untuk melanjutkan</string>
+    <string name="hint_email">Masukkan email</string>
+    <string name="hint_password">Masukkan password</string>
+    <string name="forgot_password">Lupa?</string>
+    <string name="or_text">Atau Masuk Dengan</string>
+    <string name="google_login">Masuk dengan Google</string>
 </resources>
