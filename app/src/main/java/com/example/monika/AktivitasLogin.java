@@ -55,8 +55,8 @@ public class AktivitasLogin extends AppCompatActivity {
 
             Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
             
-            // Pindah ke halaman saran tindakan
-            Intent intent = new Intent(AktivitasLogin.this, AktivitasSaran.class);
+            // Pindah ke halaman Dashboard
+            Intent intent = new Intent(AktivitasLogin.this, DashboardActivity.class);
             startActivity(intent);
             finish();
         }

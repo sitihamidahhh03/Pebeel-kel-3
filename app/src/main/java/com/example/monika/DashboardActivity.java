@@ -22,7 +22,9 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         // 1. Header & Footer
-        new HeaderManager(this);
+        HeaderManager header = new HeaderManager(this); // Simpan ke variabel header
+        header.setHeaderTitle("Dashboard");            // Tambahkan baris ini untuk ubah judul
+
         FooterManager footer = new FooterManager(this);
         footer.setActiveMenu(R.id.indicator_home);
 

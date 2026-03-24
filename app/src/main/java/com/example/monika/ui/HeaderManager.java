@@ -1,10 +1,14 @@
 package com.example.monika.ui;
 
 import android.app.Activity;
+import android.content.Context; // Tambahan untuk SharedPreferences
+import android.content.Intent;  // Tambahan untuk pindah halaman
+import android.content.SharedPreferences; // Tambahan untuk ambil data email
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.example.monika.AktivitasProfil; // Import halaman tujuan
 import com.example.monika.R; // Sesuaikan dengan package
 
 public class HeaderManager {
@@ -31,6 +35,17 @@ public class HeaderManager {
                 public void onClick(View v) {
                     // Menampilkan pesan sementara
                     Toast.makeText(activity, "Membuka Profil Pengguna...", Toast.LENGTH_SHORT).show();
+
+                    // --- BAGIAN PINDAH HALAMAN (TAMBAHAN) ---
+                    // Ambil email yang tersimpan di memori (SyamPref)
+                    SharedPreferences pref = activity.getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
+                    String emailTersimpan = pref.getString("email", "User@email.com");
+
+                    // Perintah pindah ke AktivitasProfil
+                    Intent intent = new Intent(activity, AktivitasProfil.class);
+                    intent.putExtra("EMAIL_USER", emailTersimpan); // Kirim email agar tampil di profil
+                    activity.startActivity(intent);
+                    // ----------------------------------------
                 }
             });
         }

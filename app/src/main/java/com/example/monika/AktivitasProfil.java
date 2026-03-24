@@ -29,7 +29,15 @@ public class AktivitasProfil extends AppCompatActivity {
             btnKembali.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    finish(); // Kembali ke halaman sebelumnya
+                    // 1. Pindah ke Dashboard secara eksplisit
+                    Intent intent = new Intent(AktivitasProfil.this, DashboardActivity.class);
+
+                    // 2. Flag agar tidak menumpuk halaman di RAM
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                    // 3. Pindah halaman
+                    startActivity(intent);
+                    finish();
                 }
             });
         }
