@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import com.example.monika.R;
 import android.content.Intent;
 import com.example.monika.ReadAlarm;
+import com.example.monika.GrafikActivity;
 public class FooterManager {
 
     private Activity activity;
@@ -37,7 +38,14 @@ public class FooterManager {
 
         // 3. Logika Klik (Hanya ganti status di satu halaman)
         if (menuHome != null) menuHome.setOnClickListener(v -> setActiveMenu(R.id.indicator_home));
-        if (menuChart != null) menuChart.setOnClickListener(v -> setActiveMenu(R.id.indicator_chart));
+        if (menuChart != null) {
+            menuChart.setOnClickListener(v -> {
+                setActiveMenu(R.id.indicator_chart);
+
+                Intent intent = new Intent(activity, GrafikActivity.class);
+                activity.startActivity(intent);
+            });
+        }
         if (menuAlarm != null) {
             menuAlarm.setOnClickListener(v -> {
                 activity.startActivity(new Intent(activity, ReadAlarm.class));
