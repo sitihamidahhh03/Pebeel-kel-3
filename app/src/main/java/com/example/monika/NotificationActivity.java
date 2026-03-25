@@ -1,5 +1,7 @@
 package com.example.monika;
 
+import com.example.monika.ui.HeaderManager;
+import com.example.monika.ui.FooterManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,12 +26,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class NotificationActivity extends AppCompatActivity {
 
     private boolean isExpandedGroup = false;
     private boolean isExpandedRendah = true;
     private boolean isExpandedTinggi = true;
     private boolean isExpandedMenyiram = true;
+    private HeaderManager headerManager;
+    private FooterManager footerManager;
 
     private static final String CHANNEL_ID = "syram_notifications";
     private static final int NOTIFICATION_ID = 101;
@@ -38,7 +42,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_notification);
+
+        headerManager = new HeaderManager(this);
+        headerManager.setHeaderTitle("Notifikasi");
+
+        footerManager = new FooterManager(this);
+        // Pastikan R.id.indicator_notification sesuai dengan ID di FooterManager kamu
+        footerManager.setActiveMenu(R.id.indicator_bell);
         
         View mainView = findViewById(R.id.main);
         if (mainView != null) {
@@ -150,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
     private void showSystemNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, NotificationActivity.class);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)

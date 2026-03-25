@@ -66,11 +66,11 @@ public class MonitoringManager {
         int color;
 
         if (value <= 30) {
-            status = "Kering/Kritis";
+            status = "Kering";
             saran = "Tanah terlalu kering (" + value + "%). Tanaman berisiko layu permanen. Tindakan: Segera nyalakan penyiraman.";
             color = Color.parseColor("#FF5252"); // Merah
         } else if (value <= 60) {
-            status = "Optimal/Sedang";
+            status = "Optimal";
             saran = "Kondisi ideal untuk kebanyakan tanaman (" + value + "%). Akar bisa menyerap air dan oksigen dengan seimbang.";
             color = Color.parseColor("#8BAE66"); // Hijau
         } else if (value <= 80) {
@@ -78,7 +78,7 @@ public class MonitoringManager {
             saran = "Tanah sangat lembap (" + value + "%). Cocok untuk tanaman yang suka air, namun waspadai jamur jika bertahan terlalu lama.";
             color = Color.parseColor("#448AFF"); // Biru
         } else {
-            status = "Jenuh/Banjir";
+            status = "Banjir";
             saran = "Tanah tergenang air (" + value + "%). Berisiko menyebabkan pembusukan akar. Tindakan: Hentikan penyiraman dan perbaiki drainase.";
             color = Color.parseColor("#795548"); // Cokelat
         }
