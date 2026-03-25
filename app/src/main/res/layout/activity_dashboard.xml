@@ -24,7 +24,9 @@
 
             <include layout="@layout/layout_monitoring_tanah" />
 
-            <include layout="@layout/komponen_saran_dashboard" />
+            <include
+                android:id="@+id/cardSaran"
+                layout="@layout/komponen_saran_dashboard" />
 
             <include layout="@layout/layout_button_siram" />
 
