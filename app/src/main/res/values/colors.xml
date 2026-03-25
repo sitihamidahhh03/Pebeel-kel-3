@@ -8,6 +8,8 @@
     <color name="syam_green_medium">#8BA870</color> <!-- Hijau sedang untuk teks tanggal -->
     <color name="syam_green_light">#EAF2E1</color> <!-- Hijau sangat muda untuk background layar -->
 
+    <color name="warning_yellow">#FFC107</color> <!-- Warna Kuning Peringatan -->
+
     <color name="wireframe_text_hint">#808080</color>
     <color name="palette_google_red">#EA4335</color>
 

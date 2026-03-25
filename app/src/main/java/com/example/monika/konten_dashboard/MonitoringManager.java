@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.example.monika.R;
@@ -18,6 +19,7 @@ public class MonitoringManager {
     private Runnable runnable;
     private ProgressBar progressBar;
     private TextView tvStatus, tvPercentage, tvPesanSaran;
+    private ImageView ivIconPeringatan;
     private View cardSaran;
 
     public MonitoringManager(Activity activity) {
@@ -29,6 +31,7 @@ public class MonitoringManager {
         
         // Hubungkan ke ID yang ada di komponen_saran_dashboard.xml
         this.tvPesanSaran = activity.findViewById(R.id.tvPesanSaran);
+        this.ivIconPeringatan = activity.findViewById(R.id.ivIconPeringatan);
         this.cardSaran = activity.findViewById(R.id.cardSaran);
 
         this.handler = new Handler(Looper.getMainLooper());
@@ -87,6 +90,11 @@ public class MonitoringManager {
         // Update teks saran secara dinamis
         if (tvPesanSaran != null) {
             tvPesanSaran.setText(saran);
+        }
+
+        // Update warna ikon peringatan agar sesuai dengan status/warna persentase
+        if (ivIconPeringatan != null) {
+            ivIconPeringatan.setImageTintList(ColorStateList.valueOf(color));
         }
     }
 
