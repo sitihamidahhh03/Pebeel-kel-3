@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Warna Persis sesuai Gambar Login & Dashboard -->
+    <color name="syram_primary_dark">#424E36</color> <!-- Hijau botol gelap (Tombol Login) -->
+    <color name="syram_bg_main">#E6EDE3</color>      <!-- Hijau pucat/krem (Background dashboard) -->
+    <color name="syram_text_title">#2E3B23</color>   <!-- Hijau sangat tua (Teks judul) -->
+
+    <color name="gray_text">#757575</color>
 </resources>
