@@ -1,15 +1,18 @@
 package com.example.monika;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class ReadAlarm extends AppCompatActivity {
 
     ImageView btnAdd;
+    LinearLayout containerAlarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,13 +20,102 @@ public class ReadAlarm extends AppCompatActivity {
         setContentView(R.layout.activity_read_alarm);
 
         btnAdd = findViewById(R.id.btnAdd);
+        containerAlarm = findViewById(R.id.containerAlarm);
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ReadAlarm.this, AddAlarm.class);
-                startActivity(intent);
-            }
+        btnAdd.setOnClickListener(view -> {
+            Intent intent = new Intent(ReadAlarm.this, AddAlarm.class);
+            startActivityForResult(intent, 1); // ADD
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK && data != null) {
+
+            String time = data.getStringExtra("time");
+            String label = data.getStringExtra("label");
+
+            if (requestCode == 1) {
+                // TAMBAH
+                tambahAlarm(time, label);
+
+            } else if (requestCode == 2) {
+                // EDIT
+                int index = data.getIntExtra("index", -1);
+                if (index != -1) {
+                    updateAlarm(index, time, label);
+                }
+            }
+        }
+    }
+
+    private void tambahAlarm(String time, String label) {
+
+        LinearLayout item = new LinearLayout(this);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                200
+        );
+        params.setMargins(0, 0, 0, 24);
+        item.setLayoutParams(params);
+
+        item.setOrientation(LinearLayout.HORIZONTAL);
+        item.setBackgroundResource(R.drawable.bg_card_alarm);
+        item.setPadding(32, 32, 32, 32);
+
+        // TEXT CONTAINER
+        LinearLayout textContainer = new LinearLayout(this);
+        textContainer.setOrientation(LinearLayout.VERTICAL);
+        textContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1
+        ));
+
+        TextView tvTime = new TextView(this);
+        tvTime.setText(time);
+        tvTime.setTextSize(18);
+        tvTime.setTextColor(getResources().getColor(android.R.color.white));
+
+        TextView tvLabel = new TextView(this);
+        tvLabel.setText(label);
+        tvLabel.setTextColor(getResources().getColor(android.R.color.white));
+
+        textContainer.addView(tvTime);
+        textContainer.addView(tvLabel);
+
+        // DELETE
+        ImageView delete = new ImageView(this);
+        delete.setImageResource(android.R.drawable.ic_menu_delete);
+        delete.setOnClickListener(v -> containerAlarm.removeView(item));
+
+        item.addView(textContainer);
+        item.addView(delete);
+
+        // 🔥 CLICK UNTUK EDIT
+        item.setOnClickListener(v -> {
+            Intent intent = new Intent(ReadAlarm.this, AddAlarm.class);
+            intent.putExtra("time", tvTime.getText().toString());
+            intent.putExtra("label", tvLabel.getText().toString());
+            intent.putExtra("index", containerAlarm.indexOfChild(item));
+            startActivityForResult(intent, 2); // EDIT
+        });
+
+        containerAlarm.addView(item);
+    }
+
+    private void updateAlarm(int index, String time, String label) {
+
+        LinearLayout item = (LinearLayout) containerAlarm.getChildAt(index);
+
+        LinearLayout textContainer = (LinearLayout) item.getChildAt(0);
+
+        TextView tvTime = (TextView) textContainer.getChildAt(0);
+        TextView tvLabel = (TextView) textContainer.getChildAt(1);
+
+        tvTime.setText(time);
+        tvLabel.setText(label);
     }
 }

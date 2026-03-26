@@ -55,4 +55,7 @@ public class AlarmModel {
     public void setActive(boolean active) {
         isActive = active;
     }
+    public String getTime() {
+        return String.format("%02d:%02d", hour, minute);
+    }
 }
