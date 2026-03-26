@@ -11,15 +11,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MoNiKa">
+
+        <!-- Activity utama (launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Dashboard -->
+        <activity android:name=".DashboardActivity" />
+
+        <!-- Add Alarm -->
+        <activity
+            android:name=".AddAlarm"
+            android:parentActivityName=".DashboardActivity" />
+
     </application>
 
 </manifest>
