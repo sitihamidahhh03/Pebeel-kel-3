@@ -4,17 +4,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class ClockManager {
 
-    private TextView tvTime;
-    private TextView tvDate;
-    private Handler handler;
+    private final TextView tvTime, tvDate;
+    private final Handler handler;
     private Runnable runnable;
-    private boolean isRunning;
 
     public ClockManager(TextView tvTime, TextView tvDate) {
         this.tvTime = tvTime;
@@ -23,40 +20,35 @@ public class ClockManager {
         startClock();
     }
 
-    public void startClock() {
-        if (isRunning) return;
-        isRunning = true;
-
+    private void startClock() {
         runnable = new Runnable() {
             @Override
             public void run() {
-                updateTime();
-                if (isRunning) {
-                    handler.postDelayed(this, 1000);
-                }
+                // 1. Ambil data waktu sekarang
+                Calendar calendar = Calendar.getInstance();
+
+                // 2. Format Jam (Contoh: 13:45 WITA)
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String currentTime = timeFormat.format(calendar.getTime()) + " WITA";
+
+                // 3. Format Tanggal (Contoh: Minggu, 22 Maret 2026)
+                // Locale id_ID supaya harinya Bahasa Indonesia (Senin, Selasa, dst)
+                SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
+                String currentDate = dateFormat.format(calendar.getTime());
+
+                // 4. Update Tampilan ke UI
+                if (tvTime != null) tvTime.setText(currentTime);
+                if (tvDate != null) tvDate.setText(currentDate);
+
+                // 5. Ulangi setiap 1 detik (1000ms) agar jam terus berjalan
+                handler.postDelayed(this, 1000);
             }
         };
         handler.post(runnable);
     }
 
-    private void updateTime() {
-        Date now = new Date();
-
-        // Format waktu
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-        if (tvTime != null) {
-            tvTime.setText(timeFormat.format(now));
-        }
-
-        // Format tanggal
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("id", "ID"));
-        if (tvDate != null) {
-            tvDate.setText(dateFormat.format(now));
-        }
-    }
-
+    // Fungsi untuk mematikan jam (dipanggil di onDestroy Activity)
     public void stopClock() {
-        isRunning = false;
         if (handler != null && runnable != null) {
             handler.removeCallbacks(runnable);
         }

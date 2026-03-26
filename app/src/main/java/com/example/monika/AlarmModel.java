@@ -1,27 +1,21 @@
+// AlarmModel.java
 package com.example.monika;
 
 public class AlarmModel {
     private int id;
-    private String time;
+    private int hour;
+    private int minute;
     private String label;
     private boolean isActive;
 
-    // Constructor untuk alarm baru
-    public AlarmModel(String time, String label) {
-        this.time = time;
-        this.label = label;
-        this.isActive = true;
-    }
-
-    // Constructor lengkap dengan id
-    public AlarmModel(int id, String time, String label, boolean isActive) {
+    public AlarmModel(int id, int hour, int minute, String label, boolean isActive) {
         this.id = id;
-        this.time = time;
+        this.hour = hour;
+        this.minute = minute;
         this.label = label;
         this.isActive = isActive;
     }
 
-    // Getter dan Setter
     public int getId() {
         return id;
     }
@@ -30,12 +24,20 @@ public class AlarmModel {
         this.id = id;
     }
 
-    public String getTime() {
-        return time;
+    public int getHour() {
+        return hour;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public void setMinute(int minute) {
+        this.minute = minute;
     }
 
     public String getLabel() {

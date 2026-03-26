@@ -22,6 +22,7 @@ public class HeaderManager {
     private void initHeader() {
         // 1. Menghubungkan variabel dengan ID yang ada di layout_header.xml
         ivProfile = activity.findViewById(R.id.ivProfile);
+        tvLogoApp = activity.findViewById(R.id.tvLogoApp);
 
         // 2. Fungsi Klik pada Icon Profil
         if (ivProfile != null) {

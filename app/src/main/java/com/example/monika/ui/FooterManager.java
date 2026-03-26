@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 import com.example.monika.R;
 import android.content.Intent;
-import com.example.monika.AddAlarm;
+import com.example.monika.ReadAlarm;
 public class FooterManager {
 
     private Activity activity;
@@ -40,7 +40,7 @@ public class FooterManager {
         if (menuChart != null) menuChart.setOnClickListener(v -> setActiveMenu(R.id.indicator_chart));
         if (menuAlarm != null) {
             menuAlarm.setOnClickListener(v -> {
-                activity.startActivity(new Intent(activity, AddAlarm.class));
+                activity.startActivity(new Intent(activity, ReadAlarm.class));
                 activity.finish();
             });
         }
