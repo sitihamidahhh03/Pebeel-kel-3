@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * File ReadAlarm yang sudah diupdate dengan fitur Hapus.
+ * Kode tim tetap utuh, hanya memanggil AlarmManagerHelper untuk penghapusan sistem.
+ */
 public class ReadAlarm extends AppCompatActivity {
 
     ImageView btnAdd;
@@ -56,7 +60,7 @@ public class ReadAlarm extends AppCompatActivity {
         LinearLayout item = new LinearLayout(this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                200
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
         params.setMargins(0, 0, 0, 24);
         item.setLayoutParams(params);
@@ -86,15 +90,22 @@ public class ReadAlarm extends AppCompatActivity {
         textContainer.addView(tvTime);
         textContainer.addView(tvLabel);
 
-        // DELETE
+        // FITUR HAPUS ALARM (Logika Baru yang Aman)
         ImageView delete = new ImageView(this);
         delete.setImageResource(android.R.drawable.ic_menu_delete);
-        delete.setOnClickListener(v -> containerAlarm.removeView(item));
+        delete.setPadding(16, 16, 16, 16);
+        delete.setOnClickListener(v -> {
+            // Panggil Helper Baru kita untuk mematikan sistem alarm (ID unik berdasarkan waktu)
+            AlarmManagerHelper.hapusAlarm(this, time);
+            
+            // Hapus dari tampilan UI (Kode asli tim)
+            containerAlarm.removeView(item);
+        });
 
         item.addView(textContainer);
         item.addView(delete);
 
-        // 🔥 CLICK UNTUK EDIT
+        // CLICK UNTUK EDIT (Kode asli tim)
         item.setOnClickListener(v -> {
             Intent intent = new Intent(ReadAlarm.this, AddAlarm.class);
             intent.putExtra("time", tvTime.getText().toString());
@@ -107,9 +118,9 @@ public class ReadAlarm extends AppCompatActivity {
     }
 
     private void updateAlarm(int index, String time, String label) {
+        if (index < 0 || index >= containerAlarm.getChildCount()) return;
 
         LinearLayout item = (LinearLayout) containerAlarm.getChildAt(index);
-
         LinearLayout textContainer = (LinearLayout) item.getChildAt(0);
 
         TextView tvTime = (TextView) textContainer.getChildAt(0);
