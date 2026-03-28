@@ -24,4 +24,10 @@
     <color name="syram_text_title">#2E3B23</color>   <!-- Hijau sangat tua (Teks judul) -->
 
     <color name="gray_text">#757575</color>
+
+    <!-- Warna tambahan untuk memperbaiki error resource linking -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
 </resources>

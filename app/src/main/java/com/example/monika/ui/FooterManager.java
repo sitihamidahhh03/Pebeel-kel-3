@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.ImageView;
 import com.example.monika.DashboardActivity;
 import com.example.monika.NotificationActivity;
+import com.example.monika.GrafikActivity;
+import com.example.monika.ReadAlarm;
 import com.example.monika.R;
 
 public class FooterManager {
@@ -43,22 +45,42 @@ public class FooterManager {
         containerAlarm = activity.findViewById(R.id.container_alarm);
         containerBell = activity.findViewById(R.id.container_bell);
 
-        // 3. LOGIKA PINDAH HALAMAN (INTENT) - INI YANG TADI KURANG
+        // 3. LOGIKA PINDAH HALAMAN (INTENT)
         if (containerHome != null) {
             containerHome.setOnClickListener(v -> {
-                // Jangan pindah kalau kita sudah di Dashboard
                 if (!(activity instanceof DashboardActivity)) {
                     Intent intent = new Intent(activity, DashboardActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0); // Tanpa animasi biar gak kedip
+                    activity.overridePendingTransition(0, 0);
+                }
+            });
+        }
+
+        if (containerChart != null) {
+            containerChart.setOnClickListener(v -> {
+                if (!(activity instanceof GrafikActivity)) {
+                    Intent intent = new Intent(activity, GrafikActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    activity.startActivity(intent);
+                    activity.overridePendingTransition(0, 0);
+                }
+            });
+        }
+
+        if (containerAlarm != null) {
+            containerAlarm.setOnClickListener(v -> {
+                if (!(activity instanceof ReadAlarm)) {
+                    Intent intent = new Intent(activity, ReadAlarm.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    activity.startActivity(intent);
+                    activity.overridePendingTransition(0, 0);
                 }
             });
         }
 
         if (containerBell != null) {
             containerBell.setOnClickListener(v -> {
-                // Jangan pindah kalau kita sudah di Notifikasi
                 if (!(activity instanceof NotificationActivity)) {
                     Intent intent = new Intent(activity, NotificationActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -67,8 +89,6 @@ public class FooterManager {
                 }
             });
         }
-
-        // Catatan: Lakukan hal yang sama untuk menuChart dan menuAlarm jika nanti sudah ada Activity-nya.
     }
 
     public void setActiveMenu(int activeIndicatorID) {

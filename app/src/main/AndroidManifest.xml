@@ -39,6 +39,18 @@
             android:name=".NotificationActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".GrafikActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReadAlarm"
+            android:exported="false" />
+
+        <activity
+            android:name=".AddAlarm"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/syam_green_light"
+    android:background="#F5F8F2"
     tools:context=".AktivitasProfil">
 
     <!-- Header -->
@@ -84,7 +84,7 @@
         android:layout_marginTop="60dp"
         android:background="@drawable/bg_tombol_hijau"
         app:backgroundTint="@null"
-        android:text="Log out"
+        android:text="Logout"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp"

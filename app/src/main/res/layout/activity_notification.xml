@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/syram_bg_main"
+    android:background="#F5F8F2"
     tools:context=".NotificationActivity">
 
     <include

@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.monika.ui.FooterManager;
+import com.example.monika.ui.HeaderManager;
+
 /**
  * File ReadAlarm yang sudah diupdate dengan fitur Hapus.
  * Kode tim tetap utuh, hanya memanggil AlarmManagerHelper untuk penghapusan sistem.
@@ -22,6 +25,13 @@ public class ReadAlarm extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read_alarm);
+
+        // 1. Inisialisasi Header & Footer
+        HeaderManager header = new HeaderManager(this);
+        header.setHeaderTitle("Pengingat");
+
+        FooterManager footer = new FooterManager(this);
+        footer.setActiveMenu(R.id.indicator_alarm);
 
         btnAdd = findViewById(R.id.btnAdd);
         containerAlarm = findViewById(R.id.containerAlarm);

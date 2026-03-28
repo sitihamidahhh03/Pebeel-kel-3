@@ -166,7 +166,7 @@
                 app:backgroundTint="@null"
                 android:text="Login dengan Google"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -7,6 +7,8 @@ import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.monika.ui.FooterManager;
+import com.example.monika.ui.HeaderManager;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
@@ -29,6 +31,14 @@ public class GrafikActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grafik);
 
+        // 1. Inisialisasi Header & Footer
+        HeaderManager header = new HeaderManager(this);
+        header.setHeaderTitle("Grafik Kelembaban");
+
+        FooterManager footer = new FooterManager(this);
+        footer.setActiveMenu(R.id.indicator_chart);
+
+        // 2. Inisialisasi Chart & Layout
         barChart = findViewById(R.id.barChart);
         pieChart = findViewById(R.id.pieChart);
         swipeRefresh = findViewById(R.id.swipeRefresh);
