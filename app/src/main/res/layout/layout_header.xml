@@ -8,6 +8,15 @@
     android:gravity="center_vertical"
     android:elevation="4dp">
 
+    <ImageView
+        android:id="@+id/btnKembali"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_kembali"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"
+        app:tint="#FFFFFF" />
+
     <TextView
         android:id="@+id/tvLogoApp"
         android:layout_width="0dp"

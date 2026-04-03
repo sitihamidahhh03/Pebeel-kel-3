@@ -16,6 +16,7 @@ public class AddAlarm extends AppCompatActivity {
 
     private TextView tvTime;
     private EditText etLabel;
+    private TextView tvTitle;
     private Button btnSave;
     private Button btnCancel;
     private Button btnBack;
@@ -28,6 +29,7 @@ public class AddAlarm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_alarm);
 
+        tvTitle = findViewById(R.id.tv_title_page);
         tvTime = findViewById(R.id.tv_time);
         etLabel = findViewById(R.id.et_label);
         btnSave = findViewById(R.id.btn_save);
@@ -42,21 +44,31 @@ public class AddAlarm extends AppCompatActivity {
 
         // 🔥 CEK MODE EDIT
         Intent intent = getIntent();
-        if (intent.hasExtra("time")) {
+        if (intent.hasExtra("index")) { // Gunakan 'index' sebagai penanda mode EDIT
+            // MODE EDIT
+            if (tvTitle != null) tvTitle.setText("Edit Alarm");
+            btnSave.setText("Perbarui Alarm");
+
+            // Ambil data yang dikirim dari ReadAlarm
             String time = intent.getStringExtra("time");
             String label = intent.getStringExtra("label");
 
-            tvTime.setText(time);
-            etLabel.setText(label);
-
-            // parsing waktu ke jam & menit
-            try {
-                String[] parts = time.split(":");
-                selectedHour = Integer.parseInt(parts[0]);
-                selectedMinute = Integer.parseInt(parts[1]);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (time != null) {
+                tvTime.setText(time);
+                // Parsing waktu ke jam & menit agar TimePicker mulai dari jam tersebut
+                try {
+                    String[] parts = time.split(":");
+                    selectedHour = Integer.parseInt(parts[0]);
+                    selectedMinute = Integer.parseInt(parts[1]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+            etLabel.setText(label);
+        } else {
+            // MODE TAMBAH
+            if (tvTitle != null) tvTitle.setText("Tambah Alarm");
+            btnSave.setText("Simpan Alarm");
         }
 
         tvTime.setOnClickListener(v -> showTimePicker());

@@ -16,6 +16,8 @@ public class HeaderManager {
     private Activity activity;
     private ImageView ivProfile;
     private TextView tvLogoApp;
+    private ImageView ivBack;
+    private View btnKembali;
 
     // Constructor: Menghubungkan Manager ini dengan Activity
     public HeaderManager(Activity activity) {
@@ -27,6 +29,7 @@ public class HeaderManager {
         // 1. Menghubungkan variabel dengan ID yang ada di layout_header.xml
         ivProfile = activity.findViewById(R.id.ivProfile);
         tvLogoApp = activity.findViewById(R.id.tvLogoApp);
+        btnKembali = activity.findViewById(R.id.btnKembali);
 
         // 2. Fungsi Klik pada Icon Profil
         if (ivProfile != null) {
@@ -50,16 +53,19 @@ public class HeaderManager {
             });
         }
 
-        // 3. Fungsi Klik pada Logo/Nama Aplikasi (Opsional)
-        if (tvLogoApp != null) {
-            tvLogoApp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Klik logo untuk kembali ke paling atas atau refresh
-                    Toast.makeText(activity, "Dashboard Pertanian Cabai", Toast.LENGTH_SHORT).show();
-                }
-            });
+
+    }
+
+    public void showBackButton(boolean show) {
+        if (btnKembali != null) {
+            btnKembali.setVisibility(show ? View.VISIBLE : View.GONE);
+            btnKembali.setOnClickListener(v -> activity.finish());
         }
+    }
+
+    public void showProfileIcon(boolean show) {if (ivProfile != null) {
+        ivProfile.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
     }
 
     // Fungsi tambahan jika ingin mengubah judul secara dinamis dari Java

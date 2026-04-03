@@ -9,11 +9,9 @@
     tools:context=".AktivitasProfil">
 
     <!-- Header -->
-    <View
-        android:id="@+id/headerBg"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/syam_green_dark"
+    <include
+        android:id="@+id/layout_header_profil"
+        layout="@layout/layout_header"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -48,7 +46,7 @@
         android:background="@drawable/bg_lingkaran_abu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerBg" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_header_profil" />
 
     <TextView
         android:id="@+id/tvNamaUser"
