@@ -10,25 +10,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
+import androidx.core.content.ContextCompat;
 import java.util.List;
 
 public class NotificationActivity extends AppCompatActivity {
 
     private HeaderManager headerManager;
     private FooterManager footerManager;
-    private SwipeRefreshLayout swipeRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+        
+        // --- FIX BAGIAN ATAS PUTIH ---
+        // Set warna status bar secara manual agar sama dengan Header (Hijau Gelap)
+        if (getWindow() != null) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.syam_green_dark));
+        }
+
         setContentView(R.layout.activity_notification);
 
         headerManager = new HeaderManager(this);
@@ -36,32 +36,9 @@ public class NotificationActivity extends AppCompatActivity {
 
         footerManager = new FooterManager(this);
         footerManager.setActiveMenu(R.id.indicator_bell);
-        
-        View mainView = findViewById(R.id.main);
-        if (mainView != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
-                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-                return insets;
-            });
-        }
 
-        // --- KONFIGURASI SWIPE REFRESH ---
-        swipeRefresh = findViewById(R.id.swipeRefresh);
+        // TAMPILKAN RIWAYAT DI DALAM HALAMAN
         LinearLayout historyContainer = findViewById(R.id.container_riwayat_notif);
-
-        if (swipeRefresh != null) {
-            swipeRefresh.setOnRefreshListener(() -> {
-                // Refresh riwayat notifikasi
-                if (historyContainer != null) {
-                    displayNotificationHistory(historyContainer);
-                }
-                // Hentikan animasi loading setelah selesai (PENTING!)
-                swipeRefresh.setRefreshing(false);
-            });
-        }
-
-        // TAMPILKAN RIWAYAT PERTAMA KALI
         if (historyContainer != null) {
             displayNotificationHistory(historyContainer);
         }
