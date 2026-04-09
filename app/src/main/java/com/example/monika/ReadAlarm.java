@@ -13,10 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.monika.ui.FooterManager;
 import com.example.monika.ui.HeaderManager;
 
-/**
- * File ReadAlarm yang sudah diupdate dengan fitur Hapus.
- * Kode tim tetap utuh, hanya memanggil AlarmManagerHelper untuk penghapusan sistem.
- */
 public class ReadAlarm extends AppCompatActivity {
 
     ImageView btnAdd;

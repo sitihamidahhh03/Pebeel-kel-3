@@ -1,11 +1,47 @@
 <resources>
+    <!-- 1. Dasar Aplikasi -->
     <string name="app_name">MoNiKa</string>
-    <string name="logo_text">Logo</string>
-    <string name="login_title">Login</string>
-    <string name="login_subtitle">Silakan masuk untuk melanjutkan</string>
-    <string name="hint_email">Masukkan email</string>
-    <string name="hint_password">Masukkan password</string>
-    <string name="forgot_password">Lupa?</string>
-    <string name="or_text">Atau Masuk Dengan</string>
+    <string name="logo_text">SYRAM</string>
+
+    <!-- 2. Halaman Login -->
+    <string name="login_title">Selamat Datang</string>
+    <string name="login_subtitle">Silakan masuk ke akun SYRAM Anda</string>
+    <string name="hint_email">Alamat Email</string>
+    <string name="hint_password">Kata Sandi</string>
+    <string name="btn_login">Masuk Sekarang</string>
+    <string name="forgot_password">Lupa Kata Sandi?</string>
+    <string name="or_text">ATAU</string>
     <string name="google_login">Masuk dengan Google</string>
+
+    <!-- 3. Halaman Dashboard & Monitoring -->
+    <string name="title_dashboard">Dashboard</string>
+    <string name="status_tanah">Status Tanah</string>
+    <string name="btn_siram_tanaman">Siram Cabai</string>
+    <string name="title_saran">Saran Tindakan</string>
+
+    <!-- 4. Halaman Alarm (Pengingat) -->
+    <string name="title_alarm">Pengingat</string>
+    <string name="title_add_alarm">Tambah Alarm</string>
+    <string name="title_edit_alarm">Edit Alarm</string>
+    <string name="hint_label_alarm">Nama Pengingat (misal: Siram Pagi)</string>
+    <string name="btn_save_alarm">Simpan Alarm</string>
+    <string name="btn_update_alarm">Perbarui Alarm</string>
+    <string name="confirm_delete_title">Hapus Alarm</string>
+    <string name="confirm_delete_msg">Apakah Anda yakin ingin menghapus alarm ini?</string>
+
+    <!-- 5. Halaman Grafik -->
+    <string name="title_grafik">Grafik Kelembaban</string>
+    <string name="label_avg">Rata-Rata Mingguan</string>
+    <string name="label_week">Minggu Ini</string>
+    <string name="label_month">Bulan Ini</string>
+    <string name="label_year">Tahun Ini</string>
+    <string name="grafik_subtitle">Data rata-rata kelembaban tanah</string>
+
+    <!-- 6. Halaman Profil -->
+    <string name="title_profil">Profil Pengguna</string>
+    <string name="btn_logout">Keluar Akun</string>
+    <string name="confirm_logout">Apakah Anda yakin ingin keluar?</string>
+
+    <!-- 7. Halaman Notifikasi -->
+    <string name="title_notification">Notifikasi</string>
 </resources>

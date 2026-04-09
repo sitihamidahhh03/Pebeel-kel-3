@@ -1,7 +1,10 @@
 package com.example.monika;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -36,26 +39,21 @@ public class AddAlarm extends AppCompatActivity {
         btnCancel = findViewById(R.id.btn_cancel);
         btnBack = findViewById(R.id.btn_back);
 
-        // 🔥 DEFAULT WAKTU SEKARANG
         Calendar calendar = Calendar.getInstance();
         selectedHour = calendar.get(Calendar.HOUR_OF_DAY);
         selectedMinute = calendar.get(Calendar.MINUTE);
         updateTimeDisplay();
 
-        // 🔥 CEK MODE EDIT
         Intent intent = getIntent();
-        if (intent.hasExtra("index")) { // Gunakan 'index' sebagai penanda mode EDIT
-            // MODE EDIT
+        if (intent.hasExtra("index")) {
             if (tvTitle != null) tvTitle.setText("Edit Alarm");
             btnSave.setText("Perbarui Alarm");
 
-            // Ambil data yang dikirim dari ReadAlarm
             String time = intent.getStringExtra("time");
             String label = intent.getStringExtra("label");
 
             if (time != null) {
                 tvTime.setText(time);
-                // Parsing waktu ke jam & menit agar TimePicker mulai dari jam tersebut
                 try {
                     String[] parts = time.split(":");
                     selectedHour = Integer.parseInt(parts[0]);
@@ -66,13 +64,11 @@ public class AddAlarm extends AppCompatActivity {
             }
             etLabel.setText(label);
         } else {
-            // MODE TAMBAH
             if (tvTitle != null) tvTitle.setText("Tambah Alarm");
             btnSave.setText("Simpan Alarm");
         }
 
         tvTime.setOnClickListener(v -> showTimePicker());
-
         btnSave.setOnClickListener(v -> saveAlarm());
         btnCancel.setOnClickListener(v -> finish());
         btnBack.setOnClickListener(v -> finish());
@@ -108,20 +104,54 @@ public class AddAlarm extends AppCompatActivity {
             return;
         }
 
+        // --- SETUP ALARM KE SISTEM ANDROID ---
+        setSystemAlarm(time, label);
+
         Intent resultIntent = new Intent();
         resultIntent.putExtra("time", time);
         resultIntent.putExtra("label", label);
 
-        // 🔥 KIRIM INDEX JIKA EDIT
         if (getIntent().hasExtra("index")) {
-            resultIntent.putExtra("index",
-                    getIntent().getIntExtra("index", -1));
+            resultIntent.putExtra("index", getIntent().getIntExtra("index", -1));
         }
 
         setResult(Activity.RESULT_OK, resultIntent);
-
-        Toast.makeText(this, "Alarm disimpan: " + time, Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(this, "Alarm disetel: " + time, Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    private void setSystemAlarm(String time, String label) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra("alarm_label", label);
+        
+        // ID unik berdasarkan waktu untuk identifikasi saat hapus
+        int alarmId = time.hashCode();
+        
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, 
+                alarmId, 
+                intent, 
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+        calendar.set(Calendar.MINUTE, selectedMinute);
+        calendar.set(Calendar.SECOND, 0);
+
+        // Jika waktu sudah lewat hari ini, set untuk besok
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        if (alarmManager != null) {
+            // Set Alarm Tepat Waktu
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    pendingIntent
+            );
+        }
     }
 }

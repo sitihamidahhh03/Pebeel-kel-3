@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-
 import com.example.monika.konten_dashboard.ClockManager;
 import com.example.monika.konten_dashboard.MonitoringManager;
 import com.example.monika.konten_dashboard.WateringManager;
@@ -13,44 +12,36 @@ import com.example.monika.ui.HeaderManager;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private ClockManager clockManager;
     private MonitoringManager monitoringManager;
+    private ClockManager clockManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // 1. Header & Footer
-        HeaderManager header = new HeaderManager(this); // Simpan ke variabel header
-        header.setHeaderTitle("Dashboard");            // Tambahkan baris ini untuk ubah judul
+        // 1. Inisialisasi Header & Footer
+        HeaderManager header = new HeaderManager(this);
+        header.setHeaderTitle(getString(R.string.title_dashboard));
 
         FooterManager footer = new FooterManager(this);
         footer.setActiveMenu(R.id.indicator_home);
 
-        // 2. Jam & Tanggal
+        // 2. Inisialisasi Manager Konten
         TextView tvTime = findViewById(R.id.tvTime);
         TextView tvDate = findViewById(R.id.tvDate);
         clockManager = new ClockManager(tvTime, tvDate);
-
-        // 3. Monitoring (10 Detik)
+        
         monitoringManager = new MonitoringManager(this);
-
-        // 4. Switch Siram
+        
         SwitchCompat switchSiram = findViewById(R.id.switchSiram);
-        if (switchSiram != null) {
-            new WateringManager(this, switchSiram);
-        }
-    } // <--- TUTUP ONCREATE DI SINI
+        new WateringManager(this, switchSiram);
+    }
 
     @Override
-    protected void onDestroy() { // <--- ONDESTROY BERDIRI SENDIRI DI LUAR
+    protected void onDestroy() {
         super.onDestroy();
-        if (clockManager != null) {
-            clockManager.stopClock();
-        }
-        if (monitoringManager != null) {
-            monitoringManager.stopMonitoring();
-        }
-    } // <--- TUTUP ONDESTROY
-} // <--- TUTUP CLASS UTAMA
+        if (monitoringManager != null) monitoringManager.stopMonitoring();
+        if (clockManager != null) clockManager.stopClock();
+    }
+}
