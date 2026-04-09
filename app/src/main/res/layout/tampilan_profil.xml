@@ -14,52 +14,65 @@
         layout="@layout/layout_header"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/btnKembali"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="16dp"
-        android:src="@drawable/ic_kembali"
-        app:tint="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/headerBg"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/headerBg" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Setelan"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/headerBg"
-        app:layout_constraintStart_toEndOf="@+id/btnKembali"
-        app:layout_constraintTop_toTopOf="@+id/headerBg" />
-
     <!-- Konten Profil -->
-    <View
-        android:id="@+id/fotoProfilBg"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardFoto"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="60dp"
-        android:background="@drawable/bg_lingkaran_abu"
+        app:cardCornerRadius="75dp"
+        app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_header_profil" />
+        app:layout_constraintTop_toBottomOf="@+id/layout_header_profil">
 
-    <TextView
-        android:id="@+id/tvNamaUser"
+        <ImageView
+            android:id="@+id/ivFotoProfil"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_account_circle"
+            android:background="#DDDDDD" />
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/btnUbahFoto"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_lingkaran_abu"
+        android:padding="8dp"
+        android:src="@android:drawable/ic_menu_camera"
+        app:layout_constraintBottom_toBottomOf="@+id/cardFoto"
+        app:layout_constraintEnd_toEndOf="@+id/cardFoto" />
+
+    <LinearLayout
+        android:id="@+id/layoutNama"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Nama Pengguna"
-        android:textColor="@color/syam_green_dark"
-        android:textSize="22sp"
-        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fotoProfilBg" />
+        app:layout_constraintTop_toBottomOf="@+id/cardFoto">
+
+        <TextView
+            android:id="@+id/tvNamaUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama Pengguna"
+            android:textColor="@color/syam_green_dark"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/btnEditNama"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:src="@android:drawable/ic_menu_edit"
+            app:tint="@color/syam_green_dark" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvEmailUser"
@@ -71,7 +84,7 @@
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvNamaUser" />
+        app:layout_constraintTop_toBottomOf="@+id/layoutNama" />
 
     <Button
         android:id="@+id/btnLogout"

@@ -1,59 +1,72 @@
 package com.example.monika.ui;
 
 import android.app.Activity;
-import android.content.Context; // Tambahan untuk SharedPreferences
-import android.content.Intent;  // Tambahan untuk pindah halaman
-import android.content.SharedPreferences; // Tambahan untuk ambil data email
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.monika.AktivitasProfil; // Import halaman tujuan
-import com.example.monika.R; // Sesuaikan dengan package
+
+import com.example.monika.AktivitasProfil;
+import com.example.monika.DatabaseHelper;
+import com.example.monika.R;
 
 public class HeaderManager {
 
     private Activity activity;
     private ImageView ivProfile;
+    private View cvProfile; // Tambahkan referensi untuk CardView profil
     private TextView tvLogoApp;
-    private ImageView ivBack;
     private View btnKembali;
+    private DatabaseHelper dbHelper;
 
-    // Constructor: Menghubungkan Manager ini dengan Activity
     public HeaderManager(Activity activity) {
         this.activity = activity;
+        this.dbHelper = new DatabaseHelper(activity);
         initHeader();
     }
 
     private void initHeader() {
-        // 1. Menghubungkan variabel dengan ID yang ada di layout_header.xml
         ivProfile = activity.findViewById(R.id.ivProfile);
+        cvProfile = activity.findViewById(R.id.cvProfile); // Hubungkan ke CardView
         tvLogoApp = activity.findViewById(R.id.tvLogoApp);
         btnKembali = activity.findViewById(R.id.btnKembali);
 
-        // 2. Fungsi Klik pada Icon Profil
+        loadProfilePhoto();
+
         if (ivProfile != null) {
             ivProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Menampilkan pesan sementara
-                    Toast.makeText(activity, "Membuka Profil Pengguna...", Toast.LENGTH_SHORT).show();
-
-                    // --- BAGIAN PINDAH HALAMAN (TAMBAHAN) ---
-                    // Ambil email yang tersimpan di memori (SyamPref)
                     SharedPreferences pref = activity.getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
-                    String emailTersimpan = pref.getString("email", "User@email.com");
+                    String emailTersimpan = pref.getString("email", "");
 
-                    // Perintah pindah ke AktivitasProfil
                     Intent intent = new Intent(activity, AktivitasProfil.class);
-                    intent.putExtra("EMAIL_USER", emailTersimpan); // Kirim email agar tampil di profil
+                    intent.putExtra("EMAIL_USER", emailTersimpan);
                     activity.startActivity(intent);
-                    // ----------------------------------------
                 }
             });
         }
+    }
 
-
+    public void loadProfilePhoto() {
+        if (ivProfile != null) {
+            SharedPreferences pref = activity.getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
+            String email = pref.getString("email", "");
+            
+            if (!email.isEmpty()) {
+                String photoPath = dbHelper.getUserPhoto(email);
+                if (photoPath != null && !photoPath.isEmpty()) {
+                    ivProfile.setImageURI(Uri.parse(photoPath));
+                    ivProfile.setImageTintList(null);
+                } else {
+                    ivProfile.setImageResource(R.drawable.ic_account_circle);
+                }
+            }
+        }
     }
 
     public void showBackButton(boolean show) {
@@ -63,12 +76,15 @@ public class HeaderManager {
         }
     }
 
-    public void showProfileIcon(boolean show) {if (ivProfile != null) {
-        ivProfile.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
+    public void showProfileIcon(boolean show) {
+        // Sembunyikan CardView-nya agar bulatan putih tidak tersisa
+        if (cvProfile != null) {
+            cvProfile.setVisibility(show ? View.VISIBLE : View.GONE);
+        } else if (ivProfile != null) {
+            ivProfile.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
-    // Fungsi tambahan jika ingin mengubah judul secara dinamis dari Java
     public void setHeaderTitle(String title) {
         if (tvLogoApp != null) {
             tvLogoApp.setText(title);
