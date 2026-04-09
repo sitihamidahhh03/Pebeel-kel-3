@@ -18,23 +18,25 @@
             android:layout_height="wrap_content"
             android:paddingBottom="32dp">
 
-            <!-- Background Header yang dikembalikan dengan lengkungan -->
+            <!-- Background Header diperbesar untuk menampung logo yang sangat besar -->
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="0dp"
-                android:layout_height="220dp"
+                android:layout_height="450dp"
                 android:background="@drawable/bg_login_header"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Menggunakan logo.png yang tersedia di drawable -->
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:src="@drawable/logo_syram"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:src="@drawable/logo"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
+                android:contentDescription="Logo Syram"
                 app:layout_constraintTop_toTopOf="@+id/headerBackground"
                 app:layout_constraintBottom_toBottomOf="@+id/headerBackground"
                 app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +55,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Menggunakan bg_input_rounded.xml yang tersedia -->
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="0dp"
@@ -60,7 +63,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_input_oval"
+                android:background="@drawable/bg_input_rounded"
                 android:elevation="2dp"
                 android:hint="Masukkan email"
                 android:inputType="textEmailAddress"
@@ -68,6 +71,7 @@
                 android:paddingEnd="24dp"
                 android:textColorHint="@color/wireframe_text_hint"
                 android:textColor="@color/black"
+                android:autofillHints="emailAddress"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle" />
@@ -79,7 +83,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_input_oval"
+                android:background="@drawable/bg_input_rounded"
                 android:elevation="2dp"
                 android:hint="Masukkan password"
                 android:inputType="textPassword"
@@ -87,6 +91,7 @@
                 android:paddingEnd="24dp"
                 android:textColorHint="@color/wireframe_text_hint"
                 android:textColor="@color/black"
+                android:autofillHints="password"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etEmail" />
