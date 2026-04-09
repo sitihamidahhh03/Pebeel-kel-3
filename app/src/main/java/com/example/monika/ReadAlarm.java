@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.monika.ui.FooterManager;
@@ -100,20 +101,48 @@ public class ReadAlarm extends AppCompatActivity {
         textContainer.addView(tvTime);
         textContainer.addView(tvLabel);
 
-        // FITUR HAPUS ALARM (Logika Baru yang Aman)
-        ImageView delete = new ImageView(this);
-        delete.setImageResource(android.R.drawable.ic_menu_delete);
-        delete.setPadding(16, 16, 16, 16);
-        delete.setOnClickListener(v -> {
-            // Panggil Helper Baru kita untuk mematikan sistem alarm (ID unik berdasarkan waktu)
-            AlarmManagerHelper.hapusAlarm(this, time);
-            
-            // Hapus dari tampilan UI (Kode asli tim)
-            containerAlarm.removeView(item);
+        // FITUR HAPUS ALARM (Kembali pakai Icon Sampah + Custom Dialog)
+        ImageView ivDelete = new ImageView(this);
+        ivDelete.setImageResource(android.R.drawable.ic_menu_delete);
+        ivDelete.setPadding(16, 16, 16, 16);
+
+        // Memberikan warna putih pada ikon
+        ivDelete.setImageTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.WHITE));
+
+        ivDelete.setOnClickListener(v -> {
+            // 1. Inflate layout custom dialog
+            android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_konfirmasi_hapus, null);
+            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setView(dialogView)
+                    .create();
+
+            // 2. Membuat background dialog transparan agar sudut rounded CardView terlihat
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            }
+
+            // 3. Mengatur teks pesan sesuai jam alarm yang dipilih
+            TextView tvMessage = dialogView.findViewById(R.id.tvMessageDialog);
+            if (tvMessage != null) {
+                tvMessage.setText("Apakah Anda yakin ingin menghapus alarm jam " + time + "?");
+            }
+
+            // 4. Logika tombol NO (Batal)
+            dialogView.findViewById(R.id.btnNo).setOnClickListener(v1 -> dialog.dismiss());
+
+            // 5. Logika tombol YES (Hapus)
+            dialogView.findViewById(R.id.btnYes).setOnClickListener(v1 -> {
+                AlarmManagerHelper.hapusAlarm(this, time); // Hapus dari sistem
+                containerAlarm.removeView(item);           // Hapus dari layar
+                dialog.dismiss();
+            });
+
+            dialog.show();
         });
 
         item.addView(textContainer);
-        item.addView(delete);
+        item.addView(ivDelete); // Masukkan kembali ikon sampah ke dalam kartu
+
 
         // CLICK UNTUK EDIT (Kode asli tim)
         item.setOnClickListener(v -> {

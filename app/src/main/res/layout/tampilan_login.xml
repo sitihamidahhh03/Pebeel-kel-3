@@ -18,25 +18,23 @@
             android:layout_height="wrap_content"
             android:paddingBottom="32dp">
 
-            <!-- Background Header diperbesar untuk menampung logo yang sangat besar -->
+            <!-- Background Header yang dikembalikan dengan lengkungan -->
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="0dp"
-                android:layout_height="450dp"
+                android:layout_height="220dp"
                 android:background="@drawable/bg_login_header"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Ukuran Logo diperbesar 2x lipat dari sebelumnya (dari 200dp ke 400dp) -->
             <ImageView
                 android:id="@+id/ivLogo"
-                android:layout_width="400dp"
-                android:layout_height="400dp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
                 android:src="@drawable/logo_syram"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
-                android:contentDescription="Logo Syram"
                 app:layout_constraintTop_toTopOf="@+id/headerBackground"
                 app:layout_constraintBottom_toBottomOf="@+id/headerBackground"
                 app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +68,6 @@
                 android:paddingEnd="24dp"
                 android:textColorHint="@color/wireframe_text_hint"
                 android:textColor="@color/black"
-                android:autofillHints="emailAddress"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle" />
@@ -90,7 +87,6 @@
                 android:paddingEnd="24dp"
                 android:textColorHint="@color/wireframe_text_hint"
                 android:textColor="@color/black"
-                android:autofillHints="password"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etEmail" />

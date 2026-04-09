@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.example.monika.ui.HeaderManager;
 
 public class AktivitasProfil extends AppCompatActivity {
 
@@ -15,6 +16,10 @@ public class AktivitasProfil extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tampilan_profil);
 
+        HeaderManager header = new HeaderManager(this);
+        header.setHeaderTitle("Profil");
+        header.showBackButton(true);
+        header.showProfileIcon(false);
         ImageView btnKembali = findViewById(R.id.btnKembali);
         TextView tvEmailUser = findViewById(R.id.tvEmailUser);
         Button btnLogout = findViewById(R.id.btnLogout);
