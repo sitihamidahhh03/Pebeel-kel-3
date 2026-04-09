@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,12 +19,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 public class AktivitasLogin extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin, btnGoogleLogin;
+    private DatabaseHelper dbHelper;
 
     // Variabel untuk Google Login
     private GoogleSignInClient mGoogleSignInClient;
@@ -34,12 +37,14 @@ public class AktivitasLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tampilan_login);
 
+        dbHelper = new DatabaseHelper(this);
+
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
 
-        // 1. Konfigurasi Google Sign-In menggunakan Web Client ID yang baru saja dibuat
+        // 1. Konfigurasi Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken("630428215938-77g4an5cl3hchjkeua2jpgt4s0naccap.apps.googleusercontent.com")
@@ -54,7 +59,6 @@ public class AktivitasLogin extends AppCompatActivity {
             }
         });
 
-        // 2. Trigger Login Google
         btnGoogleLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,11 +68,16 @@ public class AktivitasLogin extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        // Melakukan signOut terlebih dahulu agar jendela "Pilih Akun" selalu muncul
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
     }
 
-    // C. Menangani Hasil Login - Sesuai Foto
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -82,39 +91,47 @@ public class AktivitasLogin extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            
-            // Berhasil! Kamu bisa ambil data:
             String email = account.getEmail();
-            String displayName = account.getDisplayName();
 
-            // Simpan email ke SharedPreferences agar tetap sinkron
-            saveEmailToSharedPref(email);
-
-            Toast.makeText(this, "Login Berhasil: " + displayName, Toast.LENGTH_SHORT).show();
-
-            // Lanjutkan ke DashboardActivity
-            startActivity(new Intent(AktivitasLogin.this, DashboardActivity.class));
-            finish();
+            // LOGIKA: Cek apakah email Google ini terdaftar di SQLite
+            if (dbHelper.isEmailExists(email)) {
+                String name = dbHelper.getUserName(email);
+                loginSuccess(email, name);
+            } else {
+                // Logout Google jika tidak terdaftar agar tidak auto-login di percobaan berikutnya
+                mGoogleSignInClient.signOut();
+                Toast.makeText(this, "Email Google ini tidak terdaftar di sistem!", Toast.LENGTH_LONG).show();
+            }
 
         } catch (ApiException e) {
-            // Tangkap error jika gagal
             Log.w("Google Login", "signInResult:failed code=" + e.getStatusCode());
-            Toast.makeText(this, "Gagal login Google (Error: " + e.getStatusCode() + ")", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gagal login Google", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void handleLogin() {
-        String email = etEmail.getText().toString();
-        String password = etPassword.getText().toString();
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Mohon isi semua field", Toast.LENGTH_SHORT).show();
-        } else {
-            saveEmailToSharedPref(email);
-            Toast.makeText(this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(AktivitasLogin.this, DashboardActivity.class));
-            finish();
+            return;
         }
+
+        // LOGIKA: Validasi Email dan Password menggunakan SQLite
+        if (dbHelper.checkUser(email, password)) {
+            String name = dbHelper.getUserName(email);
+            loginSuccess(email, name);
+        } else {
+            Toast.makeText(this, "Email atau Password salah!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loginSuccess(String email, String name) {
+        saveEmailToSharedPref(email);
+        Toast.makeText(this, "Selamat datang, " + name, Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(AktivitasLogin.this, DashboardActivity.class));
+        finish();
     }
 
     private void saveEmailToSharedPref(String email) {

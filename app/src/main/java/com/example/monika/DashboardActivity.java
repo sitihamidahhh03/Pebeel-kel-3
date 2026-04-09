@@ -15,6 +15,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private ClockManager clockManager;
     private MonitoringManager monitoringManager;
+    private HeaderManager header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +23,8 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         // 1. Header & Footer
-        HeaderManager header = new HeaderManager(this); // Simpan ke variabel header
-        header.setHeaderTitle("Dashboard");            // Tambahkan baris ini untuk ubah judul
+        header = new HeaderManager(this); 
+        header.setHeaderTitle("Dashboard");
 
         FooterManager footer = new FooterManager(this);
         footer.setActiveMenu(R.id.indicator_home);
@@ -41,10 +42,19 @@ public class DashboardActivity extends AppCompatActivity {
         if (switchSiram != null) {
             new WateringManager(this, switchSiram);
         }
-    } // <--- TUTUP ONCREATE DI SINI
+    }
 
     @Override
-    protected void onDestroy() { // <--- ONDESTROY BERDIRI SENDIRI DI LUAR
+    protected void onResume() {
+        super.onResume();
+        // Memuat ulang foto profil setiap kali kembali ke halaman ini
+        if (header != null) {
+            header.loadProfilePhoto();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
         if (clockManager != null) {
             clockManager.stopClock();
@@ -52,5 +62,5 @@ public class DashboardActivity extends AppCompatActivity {
         if (monitoringManager != null) {
             monitoringManager.stopMonitoring();
         }
-    } // <--- TUTUP ONDESTROY
-} // <--- TUTUP CLASS UTAMA
+    }
+}
