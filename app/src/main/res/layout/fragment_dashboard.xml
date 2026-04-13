@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F8F2"
+    android:clipChildren="false">
+
+    <include layout="@layout/layout_jam_tanggal" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <include layout="@layout/layout_monitoring_tanah" />
+
+            <include
+                android:id="@+id/cardSaran"
+                layout="@layout/komponen_saran_dashboard" />
+
+            <include layout="@layout/layout_button_siram" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -4,11 +4,9 @@ import com.example.monika.ui.HeaderManager;
 import com.example.monika.ui.FooterManager;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -16,37 +14,29 @@ import java.util.List;
 
 public class NotificationActivity extends AppCompatActivity {
 
-    private HeaderManager headerManager;
-    private FooterManager footerManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // --- FIX BAGIAN ATAS PUTIH ---
-        // Set warna status bar secara manual agar sama dengan Header (Hijau Gelap)
         if (getWindow() != null) {
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.syam_green_dark));
         }
 
         setContentView(R.layout.activity_notification);
 
-        headerManager = new HeaderManager(this);
+        HeaderManager headerManager = new HeaderManager(this);
         headerManager.setHeaderTitle(getString(R.string.title_notification));
 
-        footerManager = new FooterManager(this);
+        FooterManager footerManager = new FooterManager(this);
         footerManager.setActiveMenu(R.id.indicator_bell);
 
-        // TAMPILKAN RIWAYAT DI DALAM HALAMAN
         LinearLayout historyContainer = findViewById(R.id.container_riwayat_notif);
         if (historyContainer != null) {
             displayNotificationHistory(historyContainer);
         }
 
         setupCardDropdowns();
-        setupActionButtons();
 
-        // LOGIKA PENERIMA NOTIF DARI SYSTEM
         String statusToOpen = getIntent().getStringExtra("OPEN_STATUS");
         if (statusToOpen != null) {
             autoOpenCard(statusToOpen);
@@ -94,14 +84,15 @@ public class NotificationActivity extends AppCompatActivity {
     private void autoOpenCard(String status) {
         View contentRendah = findViewById(R.id.content_rendah);
         View contentTinggi = findViewById(R.id.content_tinggi);
-        View contentMenyiram = findViewById(R.id.content_menyiram);
 
-        if (status.equals("KERING")) {
-            if (contentRendah != null) contentRendah.setVisibility(View.VISIBLE);
-        } else if (status.equals("TINGGI") || status.equals("BANJIR")) {
-            if (contentTinggi != null) contentTinggi.setVisibility(View.VISIBLE);
-        } else if (status.equals("ALARM")) {
-            if (contentMenyiram != null) contentMenyiram.setVisibility(View.VISIBLE);
+        switch (status) {
+            case "KERING":
+                if (contentRendah != null) contentRendah.setVisibility(View.VISIBLE);
+                break;
+            case "TINGGI":
+            case "BANJIR":
+                if (contentTinggi != null) contentTinggi.setVisibility(View.VISIBLE);
+                break;
         }
     }
 
@@ -117,16 +108,5 @@ public class NotificationActivity extends AppCompatActivity {
         if (headerTinggi != null && contentTinggi != null) {
             headerTinggi.setOnClickListener(v -> contentTinggi.setVisibility(contentTinggi.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
         }
-
-        View headerMenyiram = findViewById(R.id.header_menyiram);
-        View contentMenyiram = findViewById(R.id.content_menyiram);
-        if (headerMenyiram != null && contentMenyiram != null) {
-            headerMenyiram.setOnClickListener(v -> contentMenyiram.setVisibility(contentMenyiram.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
-        }
-    }
-
-    private void setupActionButtons() {
-        if (findViewById(R.id.btn_siram) != null) findViewById(R.id.btn_siram).setOnClickListener(v -> Toast.makeText(this, "Menyiram...", Toast.LENGTH_SHORT).show());
-        if (findViewById(R.id.btn_oke) != null) findViewById(R.id.btn_oke).setOnClickListener(v -> Toast.makeText(this, "Oke!", Toast.LENGTH_SHORT).show());
     }
 }

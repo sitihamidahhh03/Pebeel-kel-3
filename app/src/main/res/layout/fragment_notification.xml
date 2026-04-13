@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/syram_bg_main"
-    tools:context=".NotificationActivity">
+    android:background="#F5F8F2">
 
     <ScrollView
-        android:id="@+id/main_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -20,7 +16,6 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <!-- SECTION: RIWAYAT NOTIFIKASI -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -28,7 +23,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="8dp"
                 android:text="Riwayat Notifikasi"
-                android:textColor="@color/syram_text_title"
+                android:textColor="#3E4D35"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -38,15 +33,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
 
-            <!-- SECTION: SARAN TINDAKAN -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="12dp"
-                android:text="@string/title_saran"
-                android:textColor="@color/syram_text_title"
+                android:text="Saran Tindakan"
+                android:textColor="#3E4D35"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
@@ -55,59 +49,40 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
+                app:cardElevation="2dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
-
                     <LinearLayout
                         android:id="@+id/header_rendah"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
+                        android:gravity="center_vertical">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_alert"
-                            app:tint="@color/warning_yellow" />
-
+                            app:tint="#FFC107" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:text="Kelembaban Rendah"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
                             android:textStyle="bold" />
-
-                        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/arrow_down_float"
-                            app:tint="@color/text_secondary" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:id="@+id/content_rendah"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:visibility="gone">
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Disarankan menyiram tanaman agar tetap sehat" />
+                            android:text="Tanah kering, disarankan untuk segera menyiram." />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -117,64 +92,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
-
+                app:cardElevation="2dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="20dp">
-
                     <LinearLayout
                         android:id="@+id/header_tinggi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
+                        android:gravity="center_vertical">
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_alert"
-                            app:tint="@color/palette_google_red" />
-
+                            app:tint="#FF5252" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:text="Kelembaban Tinggi"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp"
                             android:textStyle="bold" />
-
-                        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/arrow_down_float"
-                            app:tint="@color/text_secondary" />
                     </LinearLayout>
-
                     <LinearLayout
                         android:id="@+id/content_tinggi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
                         android:visibility="gone">
                         <TextView
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
-                            android:text="Kelembaban terlalu tinggi. Hentikan penyiraman sementara." />
+                            android:text="Kelembaban tinggi, matikan penyiraman otomatis sementara." />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,14 +1,10 @@
 package com.example.monika.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
-import com.example.monika.DashboardActivity;
-import com.example.monika.NotificationActivity;
-import com.example.monika.GrafikActivity;
-import com.example.monika.ReadAlarm;
+import androidx.viewpager2.widget.ViewPager2;
 import com.example.monika.R;
 
 public class FooterManager {
@@ -16,8 +12,8 @@ public class FooterManager {
     private Activity activity;
     private View indicatorHome, indicatorChart, indicatorAlarm, indicatorBell;
     private ImageView menuHome, menuChart, menuAlarm, menuBell;
-    // Tambahkan variabel container supaya area kliknya lebih luas (nyaman di jempol)
     private View containerHome, containerChart, containerAlarm, containerBell;
+    private ViewPager2 viewPager;
 
     private final int COLOR_ACTIVE = Color.WHITE;
     private final int COLOR_INACTIVE = Color.parseColor("#7A966B");
@@ -27,8 +23,11 @@ public class FooterManager {
         initFooter();
     }
 
+    public void setPager(ViewPager2 viewPager) {
+        this.viewPager = viewPager;
+    }
+
     private void initFooter() {
-        // 1. Hubungkan ke XML (Indikator & Icon)
         indicatorHome = activity.findViewById(R.id.indicator_home);
         indicatorChart = activity.findViewById(R.id.indicator_chart);
         indicatorAlarm = activity.findViewById(R.id.indicator_alarm);
@@ -39,54 +38,32 @@ public class FooterManager {
         menuAlarm = activity.findViewById(R.id.menu_alarm);
         menuBell = activity.findViewById(R.id.menu_bell);
 
-        // 2. Hubungkan ke Container (FrameLayout) agar kliknya gampang
         containerHome = activity.findViewById(R.id.container_home);
         containerChart = activity.findViewById(R.id.container_chart);
         containerAlarm = activity.findViewById(R.id.container_alarm);
         containerBell = activity.findViewById(R.id.container_bell);
 
-        // 3. LOGIKA PINDAH HALAMAN (INTENT)
         if (containerHome != null) {
             containerHome.setOnClickListener(v -> {
-                if (!(activity instanceof DashboardActivity)) {
-                    Intent intent = new Intent(activity, DashboardActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
+                if (viewPager != null) viewPager.setCurrentItem(0, true);
             });
         }
 
         if (containerChart != null) {
             containerChart.setOnClickListener(v -> {
-                if (!(activity instanceof GrafikActivity)) {
-                    Intent intent = new Intent(activity, GrafikActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
+                if (viewPager != null) viewPager.setCurrentItem(1, true);
             });
         }
 
         if (containerAlarm != null) {
             containerAlarm.setOnClickListener(v -> {
-                if (!(activity instanceof ReadAlarm)) {
-                    Intent intent = new Intent(activity, ReadAlarm.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
+                if (viewPager != null) viewPager.setCurrentItem(2, true);
             });
         }
 
         if (containerBell != null) {
             containerBell.setOnClickListener(v -> {
-                if (!(activity instanceof NotificationActivity)) {
-                    Intent intent = new Intent(activity, NotificationActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    activity.startActivity(intent);
-                    activity.overridePendingTransition(0, 0);
-                }
+                if (viewPager != null) viewPager.setCurrentItem(3, true);
             });
         }
     }
@@ -107,7 +84,6 @@ public class FooterManager {
     private void updateUI(View indicator, ImageView icon) {
         if (indicator != null && icon != null) {
             indicator.setVisibility(View.VISIBLE);
-            indicator.setAlpha(1f);
             icon.setColorFilter(COLOR_ACTIVE);
         }
     }

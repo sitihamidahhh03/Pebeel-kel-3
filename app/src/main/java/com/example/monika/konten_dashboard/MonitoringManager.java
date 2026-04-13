@@ -32,16 +32,21 @@ public class MonitoringManager {
     private TextView tvStatus, tvPercentage, tvPesanSaran;
     private ImageView ivIconPeringatan;
     private View cardSaran;
+    private WateringManager wateringManager;
     private static final String CHANNEL_ID = "syram_notifications";
 
-    public MonitoringManager(Activity activity) {
-        this.activity = activity;
-        this.progressBar = activity.findViewById(R.id.progressBar);
-        this.tvStatus = activity.findViewById(R.id.tvStatus);
-        this.tvPercentage = activity.findViewById(R.id.tvPercentage);
-        this.tvPesanSaran = activity.findViewById(R.id.tvPesanSaran);
-        this.ivIconPeringatan = activity.findViewById(R.id.ivIconPeringatan);
-        this.cardSaran = activity.findViewById(R.id.cardSaran);
+    // Update: Sekarang menerima rootView untuk mencari ID elemen di dalam fragment
+    public MonitoringManager(View rootView, WateringManager wateringManager) {
+        this.activity = (Activity) rootView.getContext();
+        this.wateringManager = wateringManager;
+        
+        // Mencari elemen di rootView fragment, bukan di activity
+        this.progressBar = rootView.findViewById(R.id.progressBar);
+        this.tvStatus = rootView.findViewById(R.id.tvStatus);
+        this.tvPercentage = rootView.findViewById(R.id.tvPercentage);
+        this.tvPesanSaran = rootView.findViewById(R.id.tvPesanSaran);
+        this.ivIconPeringatan = rootView.findViewById(R.id.ivIconPeringatan);
+        this.cardSaran = rootView.findViewById(R.id.cardSaran);
 
         createNotificationChannel();
         this.handler = new Handler(Looper.getMainLooper());
@@ -101,7 +106,6 @@ public class MonitoringManager {
         tvPercentage.setText(value + "%");
         progressBar.setProgress(value);
 
-        // --- SIMPAN DATA KE REPOSITORY AGAR GRAFIK SINKRON ---
         MonitoringRepository.updateTodayValue(activity, value);
 
         String status;
@@ -135,6 +139,10 @@ public class MonitoringManager {
 
         if (tvPesanSaran != null) tvPesanSaran.setText(saran);
         if (ivIconPeringatan != null) ivIconPeringatan.setImageTintList(ColorStateList.valueOf(color));
+
+        if (wateringManager != null) {
+            wateringManager.checkAutoWatering(value);
+        }
     }
 
     public void stopMonitoring() {
