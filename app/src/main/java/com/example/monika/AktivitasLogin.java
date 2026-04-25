@@ -36,18 +36,10 @@ public class AktivitasLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tampilan_login);
 
-        // --- INISIALISASI FIREBASE ---
+        // --- INISIALISASI FIREBASE (Hanya untuk Log) ---
         try {
-            // Menggunakan URL lengkap karena region database kamu di Asia Southeast 1
             String dbUrl = "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/";
-            FirebaseDatabase database = FirebaseDatabase.getInstance(dbUrl);
-            myRef = database.getReference("tes_monitoring_cabai");
-
-            // Kirim pesan pengetesan saat layar terbuka
-            myRef.setValue("Akhirnya konek dari layar Login! (" + System.currentTimeMillis() + ")")
-                .addOnSuccessListener(aVoid -> Log.d("FIREBASE_STATUS", "Koneksi Berhasil!"))
-                .addOnFailureListener(e -> Log.e("FIREBASE_STATUS", "Gagal: " + e.getMessage()));
-                
+            myRef = FirebaseDatabase.getInstance(dbUrl).getReference("logs");
         } catch (Exception e) {
             Log.e("FIREBASE_STATUS", "Error init: " + e.getMessage());
         }
@@ -133,7 +125,6 @@ public class AktivitasLogin extends AppCompatActivity {
         saveEmailToSharedPref(email);
         Toast.makeText(this, "Selamat datang, " + name, Toast.LENGTH_SHORT).show();
         
-        // Kirim log login ke Firebase sebagai penanda berhasil masuk
         if (myRef != null) {
             myRef.child("last_login").setValue(name + " (" + email + ")");
         }

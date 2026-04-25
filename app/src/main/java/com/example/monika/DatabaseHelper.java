@@ -45,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void addDefaultUsers(SQLiteDatabase db) {
         insertUser(db, "admin@syram.com", "admin123", "Admin SYRAM");
-        insertUser(db, "user@syram.com", "123456", "User SYRAM");
+        insertUser(db, " user@syram.com", "123456", "User SYRAM");
         insertUser(db, "heriheri666.hh@gmail.com", "123456", "Heri Khairi");
         insertUser(db, "herisadega193@gmail.com", "123456", "SADEGA Heri");
     }

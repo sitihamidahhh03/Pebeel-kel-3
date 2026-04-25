@@ -9,38 +9,39 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import com.example.monika.DashboardActivity;
 import com.example.monika.MonitoringRepository;
-import com.example.monika.NotificationActivity;
 import com.example.monika.NotificationRepository;
 import com.example.monika.R;
-import java.util.Random;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MonitoringManager {
 
     private Activity activity;
-    private Handler handler;
-    private Runnable runnable;
     private ProgressBar progressBar;
     private TextView tvStatus, tvPercentage, tvPesanSaran;
     private ImageView ivIconPeringatan;
     private View cardSaran;
     private WateringManager wateringManager;
     private static final String CHANNEL_ID = "syram_notifications";
+    private DatabaseReference monitoringRef;
+    private ValueEventListener monitoringListener;
 
-    // Update: Sekarang menerima rootView untuk mencari ID elemen di dalam fragment
     public MonitoringManager(View rootView, WateringManager wateringManager) {
         this.activity = (Activity) rootView.getContext();
         this.wateringManager = wateringManager;
         
-        // Mencari elemen di rootView fragment, bukan di activity
         this.progressBar = rootView.findViewById(R.id.progressBar);
         this.tvStatus = rootView.findViewById(R.id.tvStatus);
         this.tvPercentage = rootView.findViewById(R.id.tvPercentage);
@@ -49,7 +50,6 @@ public class MonitoringManager {
         this.cardSaran = rootView.findViewById(R.id.cardSaran);
 
         createNotificationChannel();
-        this.handler = new Handler(Looper.getMainLooper());
         startMonitoring();
     }
 
@@ -89,15 +89,37 @@ public class MonitoringManager {
     }
 
     private void startMonitoring() {
-        runnable = new Runnable() {
+        String dbUrl = "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/";
+        // Tahap 2 & 3: Read Real-time dari node Sensor/Kelembapan
+        monitoringRef = FirebaseDatabase.getInstance(dbUrl).getReference("Sensor/Kelembapan");
+
+        monitoringListener = new ValueEventListener() {
             @Override
-            public void run() {
-                int randomValue = new Random().nextInt(101);
-                updateDisplay(randomValue);
-                handler.postDelayed(this, 10000);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    try {
+                        Object val = snapshot.getValue();
+                        int value = 0;
+                        if (val instanceof Long) {
+                            value = ((Long) val).intValue();
+                        } else if (val instanceof Double) {
+                            value = ((Double) val).intValue();
+                        } else if (val instanceof String) {
+                            value = Integer.parseInt((String) val);
+                        }
+                        updateDisplay(value);
+                    } catch (Exception e) {
+                        Log.e("FIREBASE_READ", "Error parsing: " + e.getMessage());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("FIREBASE_READ", "Gagal baca: " + error.getMessage());
             }
         };
-        handler.post(runnable);
+        monitoringRef.addValueEventListener(monitoringListener);
     }
 
     private void updateDisplay(int value) {
@@ -146,6 +168,8 @@ public class MonitoringManager {
     }
 
     public void stopMonitoring() {
-        if (handler != null) handler.removeCallbacks(runnable);
+        if (monitoringRef != null && monitoringListener != null) {
+            monitoringRef.removeEventListener(monitoringListener);
+        }
     }
 }
