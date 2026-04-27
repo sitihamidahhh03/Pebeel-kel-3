@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.example.monika.konten_dashboard.ClockManager;
 import com.example.monika.konten_dashboard.MonitoringManager;
 import com.example.monika.konten_dashboard.WateringManager;
+import com.example.monika.konten_dashboard.WeatherManager;
 
 public class DashboardFragment extends Fragment {
 
@@ -23,6 +24,9 @@ public class DashboardFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+        // 1. Perkiraan Cuaca Real-time
+        new WeatherManager(view);
+
         // 2. Jam & Tanggal
         TextView tvTime = view.findViewById(R.id.tvTime);
         TextView tvDate = view.findViewById(R.id.tvDate);
@@ -33,7 +37,7 @@ public class DashboardFragment extends Fragment {
         SwitchCompat switchOtomatis = view.findViewById(R.id.switchOtomatis);
         WateringManager wateringManager = new WateringManager(getContext(), switchSiram, switchOtomatis);
 
-        // 4. Monitoring - Sekarang mengirimkan 'view' Fragment agar ID ditemukan dengan benar
+        // 4. Monitoring
         monitoringManager = new MonitoringManager(view, wateringManager);
 
         return view;

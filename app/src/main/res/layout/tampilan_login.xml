@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="32dp">
 
-            <!-- Background Header diperbesar untuk menampung logo yang sangat besar -->
+            <!-- Background Header -->
             <View
                 android:id="@+id/headerBackground"
                 android:layout_width="0dp"
@@ -28,7 +28,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Menggunakan logo.png yang tersedia di drawable -->
+            <!-- Logo -->
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="400dp"
@@ -55,7 +55,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Menggunakan bg_input_rounded.xml yang tersedia -->
+            <!-- Input Email -->
             <EditText
                 android:id="@+id/etEmail"
                 android:layout_width="0dp"
@@ -76,6 +76,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle" />
 
+            <!-- Input Password -->
             <EditText
                 android:id="@+id/etPassword"
                 android:layout_width="0dp"
@@ -96,18 +97,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/etEmail" />
 
-            <TextView
-                android:id="@+id/tvForgotPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="32dp"
-                android:text="Lupa password?"
-                android:textColor="@color/syam_green_dark"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etPassword" />
-
+            <!-- Tombol Login -->
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="0dp"
@@ -123,7 +113,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvForgotPassword" />
+                app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
             <View
                 android:id="@+id/separatorLeft"

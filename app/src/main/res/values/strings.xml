@@ -44,4 +44,10 @@
 
     <!-- 7. Halaman Notifikasi -->
     <string name="title_notification">Notifikasi</string>
+
+    <!-- 8. Cuaca Format -->
+    <string name="temp_format">%d°</string>
+    <string name="temp_range_format">%d° / %d°C</string>
+    <string name="humidity_format">%d%%</string>
+    <string name="feels_like_format">%d°C</string>
 </resources>

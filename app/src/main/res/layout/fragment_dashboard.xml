@@ -19,6 +19,9 @@
             android:orientation="vertical"
             android:padding="10dp">
 
+            <!-- WIDGET CUACA (BARU) -->
+            <include layout="@layout/layout_cuaca" />
+
             <include layout="@layout/layout_monitoring_tanah" />
 
             <include
