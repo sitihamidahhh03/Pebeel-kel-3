@@ -10,9 +10,9 @@ import com.example.monika.R;
 public class FooterManager {
 
     private Activity activity;
-    private View indicatorHome, indicatorChart, indicatorAlarm, indicatorBell;
-    private ImageView menuHome, menuChart, menuAlarm, menuBell;
-    private View containerHome, containerChart, containerAlarm, containerBell;
+    private View indicatorHome, indicatorChart, indicatorControl, indicatorAlarm, indicatorBell;
+    private ImageView menuHome, menuChart, menuControl, menuAlarm, menuBell;
+    private View containerHome, containerChart, containerControl, containerAlarm, containerBell;
     private ViewPager2 viewPager;
 
     private final int COLOR_ACTIVE = Color.WHITE;
@@ -30,16 +30,19 @@ public class FooterManager {
     private void initFooter() {
         indicatorHome = activity.findViewById(R.id.indicator_home);
         indicatorChart = activity.findViewById(R.id.indicator_chart);
+        indicatorControl = activity.findViewById(R.id.indicator_control);
         indicatorAlarm = activity.findViewById(R.id.indicator_alarm);
         indicatorBell = activity.findViewById(R.id.indicator_bell);
 
         menuHome = activity.findViewById(R.id.menu_home);
         menuChart = activity.findViewById(R.id.menu_chart);
+        menuControl = activity.findViewById(R.id.menu_control);
         menuAlarm = activity.findViewById(R.id.menu_alarm);
         menuBell = activity.findViewById(R.id.menu_bell);
 
         containerHome = activity.findViewById(R.id.container_home);
         containerChart = activity.findViewById(R.id.container_chart);
+        containerControl = activity.findViewById(R.id.container_control);
         containerAlarm = activity.findViewById(R.id.container_alarm);
         containerBell = activity.findViewById(R.id.container_bell);
 
@@ -55,15 +58,21 @@ public class FooterManager {
             });
         }
 
+        if (containerControl != null) {
+            containerControl.setOnClickListener(v -> {
+                if (viewPager != null) viewPager.setCurrentItem(2, true);
+            });
+        }
+
         if (containerAlarm != null) {
             containerAlarm.setOnClickListener(v -> {
-                if (viewPager != null) viewPager.setCurrentItem(2, true);
+                if (viewPager != null) viewPager.setCurrentItem(3, true);
             });
         }
 
         if (containerBell != null) {
             containerBell.setOnClickListener(v -> {
-                if (viewPager != null) viewPager.setCurrentItem(3, true);
+                if (viewPager != null) viewPager.setCurrentItem(4, true);
             });
         }
     }
@@ -74,6 +83,8 @@ public class FooterManager {
             updateUI(indicatorHome, menuHome);
         } else if (activeIndicatorID == R.id.indicator_chart) {
             updateUI(indicatorChart, menuChart);
+        } else if (activeIndicatorID == R.id.indicator_control) {
+            updateUI(indicatorControl, menuControl);
         } else if (activeIndicatorID == R.id.indicator_alarm) {
             updateUI(indicatorAlarm, menuAlarm);
         } else if (activeIndicatorID == R.id.indicator_bell) {
@@ -89,8 +100,8 @@ public class FooterManager {
     }
 
     private void resetAll() {
-        View[] indicators = {indicatorHome, indicatorChart, indicatorAlarm, indicatorBell};
-        ImageView[] icons = {menuHome, menuChart, menuAlarm, menuBell};
+        View[] indicators = {indicatorHome, indicatorChart, indicatorControl, indicatorAlarm, indicatorBell};
+        ImageView[] icons = {menuHome, menuChart, menuControl, menuAlarm, menuBell};
         for (View v : indicators) if (v != null) v.setVisibility(View.GONE);
         for (ImageView img : icons) if (img != null) img.setColorFilter(COLOR_INACTIVE);
     }

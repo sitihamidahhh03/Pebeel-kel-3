@@ -37,6 +37,7 @@ public class GrafikFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // PERBAIKAN: Menggunakan layout fragment_grafik yang bersih
         View view = inflater.inflate(R.layout.fragment_grafik, container, false);
 
         barChart = view.findViewById(R.id.barChart);
@@ -48,29 +49,33 @@ public class GrafikFragment extends Fragment {
 
         generateDynamicYears();
 
-        toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                if (checkedId == R.id.btnWeek) {
-                    currentMode = "WEEK";
-                    tvGrafikTitle.setText("Grafik Minggu Ini");
-                    tvLabelRange.setText("Minggu Ini");
-                } else if (checkedId == R.id.btnMonth) {
-                    currentMode = "MONTH";
-                    tvGrafikTitle.setText("Grafik Bulan Ini");
-                    tvLabelRange.setText("Bulan Ini");
-                } else if (checkedId == R.id.btnYear) {
-                    currentMode = "YEAR";
-                    tvGrafikTitle.setText("Grafik Tahun Ini");
-                    tvLabelRange.setText("Tahun Ini");
+        if (toggleGroup != null) {
+            toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+                if (isChecked) {
+                    if (checkedId == R.id.btnWeek) {
+                        currentMode = "WEEK";
+                        tvGrafikTitle.setText("Grafik Minggu Ini");
+                        tvLabelRange.setText("Minggu Ini");
+                    } else if (checkedId == R.id.btnMonth) {
+                        currentMode = "MONTH";
+                        tvGrafikTitle.setText("Grafik Bulan Ini");
+                        tvLabelRange.setText("Bulan Ini");
+                    } else if (checkedId == R.id.btnYear) {
+                        currentMode = "YEAR";
+                        tvGrafikTitle.setText("Grafik Tahun Ini");
+                        tvLabelRange.setText("Tahun Ini");
+                    }
+                    loadGrafikData();
                 }
-                loadGrafikData();
-            }
-        });
+            });
+        }
 
-        swipeRefresh.setOnRefreshListener(() -> {
-            loadGrafikData();
-            swipeRefresh.setRefreshing(false);
-        });
+        if (swipeRefresh != null) {
+            swipeRefresh.setOnRefreshListener(() -> {
+                loadGrafikData();
+                swipeRefresh.setRefreshing(false);
+            });
+        }
 
         loadGrafikData();
         return view;
@@ -86,7 +91,7 @@ public class GrafikFragment extends Fragment {
     }
 
     private void loadGrafikData() {
-        if (barChart == null || pieChart == null) return;
+        if (barChart == null || pieChart == null || getContext() == null) return;
 
         ArrayList<BarEntry> entries = new ArrayList<>();
         String[] labels;
@@ -108,29 +113,43 @@ public class GrafikFragment extends Fragment {
             entries.add(new BarEntry(i, realData[i]));
             total += realData[i];
         }
-        float avg = total / realData.length;
+        float avg = realData.length > 0 ? total / realData.length : 0;
 
         // Bar Chart Setup
-        BarDataSet dataSet = new BarDataSet(entries, "");
+        BarDataSet dataSet = new BarDataSet(entries, "Kelembaban");
         dataSet.setColor(Color.parseColor("#628141"));
-        barChart.setData(new BarData(dataSet));
+        dataSet.setValueTextSize(10f);
+        
+        BarData data = new BarData(dataSet);
+        barChart.setData(data);
+        
         XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
+        xAxis.setDrawGridLines(false);
+        
         barChart.getAxisRight().setEnabled(false);
         barChart.getDescription().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
+        barChart.animateY(1000);
         barChart.invalidate();
 
-        // Pie Chart Setup
+        // Pie Chart (Rata-rata) Setup
         ArrayList<PieEntry> pieEntries = new ArrayList<>();
         pieEntries.add(new PieEntry(avg));
         pieEntries.add(new PieEntry(100 - avg));
+        
         PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
-        pieDataSet.setColors(Color.parseColor("#628141"), Color.parseColor("#E0E0E0"));
-        pieChart.setData(new PieData(pieDataSet));
+        pieDataSet.setColors(new int[]{Color.parseColor("#628141"), Color.parseColor("#E0E0E0")});
+        pieDataSet.setDrawValues(false);
+        
+        PieData pieData = new PieData(pieDataSet);
+        pieChart.setData(pieData);
         pieChart.setCenterText(Math.round(avg) + "%");
+        pieChart.setHoleRadius(70f);
         pieChart.getDescription().setEnabled(false);
+        pieChart.getLegend().setEnabled(false);
         pieChart.invalidate();
     }
 }

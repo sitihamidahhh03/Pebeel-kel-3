@@ -3,30 +3,37 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/footer_parent" android:orientation="horizontal"
-    android:background="#3E4D35" android:paddingTop="12dp"
+    android:id="@+id/footer_parent"
+    android:orientation="horizontal"
+    android:background="#3E4D35"
+    android:paddingTop="12dp"
     android:paddingBottom="12dp"
     android:gravity="center_vertical"
-    android:elevation="10dp"> <FrameLayout
-    android:id="@+id/container_home"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1">
-    <View
-        android:id="@+id/indicator_home"
-        android:layout_width="55dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center"
-        android:background="@drawable/pill_active"
-        android:visibility="visible" />
-    <ImageView
-        android:id="@+id/menu_home"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_home"
-        app:tint="#FFFFFF" /> </FrameLayout>
+    android:elevation="10dp">
 
+    <!-- HOME (0) -->
+    <FrameLayout
+        android:id="@+id/container_home"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+        <View
+            android:id="@+id/indicator_home"
+            android:layout_width="45dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:background="@drawable/pill_active"
+            android:visibility="visible" />
+        <ImageView
+            android:id="@+id/menu_home"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_home"
+            app:tint="#FFFFFF" />
+    </FrameLayout>
+
+    <!-- CHART (1) -->
     <FrameLayout
         android:id="@+id/container_chart"
         android:layout_width="0dp"
@@ -34,19 +41,43 @@
         android:layout_weight="1">
         <View
             android:id="@+id/indicator_chart"
-            android:layout_width="55dp"
+            android:layout_width="45dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:background="@drawable/pill_active"
             android:visibility="gone" />
         <ImageView
             android:id="@+id/menu_chart"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_chart"
-            app:tint="#7A966B" /> </FrameLayout>
+            app:tint="#7A966B" />
+    </FrameLayout>
 
+    <!-- CONTROL / AKTUATOR (2) - BARU -->
+    <FrameLayout
+        android:id="@+id/container_control"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1">
+        <View
+            android:id="@+id/indicator_control"
+            android:layout_width="45dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:background="@drawable/pill_active"
+            android:visibility="gone" />
+        <ImageView
+            android:id="@+id/menu_control"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_control"
+            app:tint="#7A966B" />
+    </FrameLayout>
+
+    <!-- ALARM (3) -->
     <FrameLayout
         android:id="@+id/container_alarm"
         android:layout_width="0dp"
@@ -54,20 +85,21 @@
         android:layout_weight="1">
         <View
             android:id="@+id/indicator_alarm"
-            android:layout_width="55dp"
+            android:layout_width="45dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:background="@drawable/pill_active"
             android:visibility="gone" />
         <ImageView
             android:id="@+id/menu_alarm"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_alarm"
             app:tint="#7A966B" />
     </FrameLayout>
 
+    <!-- NOTIFIKASI (4) -->
     <FrameLayout
         android:id="@+id/container_bell"
         android:layout_width="0dp"
@@ -75,15 +107,15 @@
         android:layout_weight="1">
         <View
             android:id="@+id/indicator_bell"
-            android:layout_width="55dp"
+            android:layout_width="45dp"
             android:layout_height="32dp"
             android:layout_gravity="center"
             android:background="@drawable/pill_active"
             android:visibility="gone" />
         <ImageView
             android:id="@+id/menu_bell"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_notification"
             app:tint="#7A966B" />

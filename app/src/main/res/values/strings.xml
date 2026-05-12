@@ -6,11 +6,12 @@
     <!-- 2. Halaman Login -->
     <string name="login_title">Selamat Datang</string>
     <string name="login_subtitle">Silakan masuk ke akun SYRAM Anda</string>
-    <string name="hint_email">Alamat Email</string>
-    <string name="hint_password">Kata Sandi</string>
-    <string name="btn_login">Masuk Sekarang</string>
+    <string name="hint_email">Masukkan email</string>
+    <string name="hint_password">Masukkan password</string>
+    <string name="btn_login_text">LOGIN</string>
+    <string name="btn_google_login_text">LOGIN DENGAN GOOGLE</string>
     <string name="forgot_password">Lupa Kata Sandi?</string>
-    <string name="or_text">ATAU</string>
+    <string name="or_text">OR</string>
     <string name="google_login">Masuk dengan Google</string>
 
     <!-- 3. Halaman Dashboard & Monitoring -->
@@ -50,4 +51,7 @@
     <string name="temp_range_format">%d° / %d°C</string>
     <string name="humidity_format">%d%%</string>
     <string name="feels_like_format">%d°C</string>
+
+    <!-- Firebase / Google Auth -->
+    <string name="default_web_client_id">527758994039-7hhl7v2m97cmq5479s0l6im8m6avi16g.apps.googleusercontent.com</string>
 </resources>

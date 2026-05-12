@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import com.example.monika.konten_dashboard.ClockManager;
 import com.example.monika.konten_dashboard.MonitoringManager;
-import com.example.monika.konten_dashboard.WateringManager;
 import com.example.monika.konten_dashboard.WeatherManager;
 
 public class DashboardFragment extends Fragment {
@@ -32,13 +30,9 @@ public class DashboardFragment extends Fragment {
         TextView tvDate = view.findViewById(R.id.tvDate);
         clockManager = new ClockManager(tvTime, tvDate);
 
-        // 3. Switch Siram (Manual & Otomatis)
-        SwitchCompat switchSiram = view.findViewById(R.id.switchSiram);
-        SwitchCompat switchOtomatis = view.findViewById(R.id.switchOtomatis);
-        WateringManager wateringManager = new WateringManager(getContext(), switchSiram, switchOtomatis);
-
-        // 4. Monitoring
-        monitoringManager = new MonitoringManager(view, wateringManager);
+        // 3. Monitoring
+        // WateringManager dihapus dari sini karena kontrol dipindah ke ControlFragment
+        monitoringManager = new MonitoringManager(view, null);
 
         return view;
     }

@@ -3,15 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/syam_green_light"
     android:orientation="vertical">
 
-    <!-- CONTENT -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/tv_title_page"
@@ -21,24 +20,24 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:textColor="#628141"/>
+            android:layout_marginBottom="32dp"
+            android:textColor="@color/syam_green_dark"/>
 
-        <!-- Input Waktu - Menggunakan TextView dengan style seperti input -->
+         <!-- Input Waktu -->
         <TextView
             android:id="@+id/tv_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:padding="16dp"
             android:background="@android:drawable/editbox_background"
-            android:drawableRight="@android:drawable/ic_menu_edit"
+            android:drawableEnd="@android:drawable/ic_menu_edit"
             android:drawablePadding="8dp"
-            android:text="--:--"
-            android:textSize="16sp"
+            android:text="00:00"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="#000000"
             android:clickable="true"
             android:focusable="true"
-            android:hint="Pilih Waktu"
             android:gravity="start|center_vertical"/>
 
         <!-- Input Label -->
@@ -47,40 +46,44 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Label Alarm"
-            android:padding="12dp"
-            android:layout_marginTop="16dp"
-            android:background="@android:drawable/editbox_background"/>
+            android:padding="16dp"
+            android:layout_marginTop="20dp"
+            android:textColor="#000000"
+            android:background="@android:drawable/editbox_background"
+            android:inputType="textCapSentences"/>
 
         <!-- Tombol Simpan -->
         <Button
             android:id="@+id/btn_save"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#628141"
-            android:text="Simpan"
-            android:layout_marginTop="24dp"
-            android:padding="12dp"/>
+            android:layout_height="60dp"
+            android:backgroundTint="@color/syam_green_dark"
+            android:text="SIMPAN ALARM"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"/>
 
         <!-- Tombol Batal -->
         <Button
             android:id="@+id/btn_cancel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#628141"
-            android:text="Batal"
-            android:layout_marginTop="12dp"
-            android:padding="12dp"/>
+            android:layout_height="60dp"
+            android:backgroundTint="@color/syam_green_dark"
+            android:text="BATAL"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
 
         <!-- Tombol Kembali -->
         <Button
             android:id="@+id/btn_back"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#628141"
-            android:text="Kembali"
-            android:layout_marginTop="12dp"
-            android:padding="12dp"/>
+            android:layout_height="60dp"
+            android:backgroundTint="@color/syam_green_dark"
+            android:text="KEMBALI"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
 
     </LinearLayout>
-
 </LinearLayout>

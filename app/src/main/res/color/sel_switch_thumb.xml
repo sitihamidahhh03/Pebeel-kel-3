@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Disabled & Checked (Mode Otomatis - Terkunci tapi Aktif) -->
+    <item android:color="#A2AF9C" android:state_enabled="false" android:state_checked="true" />
+
+    <!-- Disabled & Unchecked -->
+    <item android:color="#D1D1D1" android:state_enabled="false" android:state_checked="false" />
+
+    <!-- Enabled & Checked (Mode Manual ON) -->
+    <item android:color="@color/syam_green_dark" android:state_enabled="true" android:state_checked="true" />
+
+    <!-- Enabled & Unchecked (Mode Manual OFF) -->
+    <item android:color="#FFFFFF" android:state_enabled="true" android:state_checked="false" />
+</selector>

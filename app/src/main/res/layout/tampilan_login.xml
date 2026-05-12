@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,166 +7,164 @@
     android:background="@color/syam_green_light"
     tools:context=".AktivitasLogin">
 
-    <ScrollView
+    <!-- Header Background -->
+    <View
+        android:id="@+id/headerBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:background="@drawable/bg_login_header"
+        app:layout_constraintHeight_percent="0.35"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="32dp">
+    <!-- Logo: Ukuran 400dp, Tengah (Bias 0.5), Clickable/Focusable False agar tidak menghalangi klik -->
+    <ImageView
+        android:id="@+id/ivLogo"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/logo_text"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        android:clickable="false"
+        android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="@+id/headerBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
-            <!-- Background Header -->
-            <View
-                android:id="@+id/headerBackground"
-                android:layout_width="0dp"
-                android:layout_height="450dp"
-                android:background="@drawable/bg_login_header"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <!-- Elemen form -->
+    <TextView
+        android:id="@+id/tvLoginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/logo_text"
+        android:textColor="@color/syam_green_dark"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/etEmail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerBackground"
+        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-            <!-- Logo -->
-            <ImageView
-                android:id="@+id/ivLogo"
-                android:layout_width="400dp"
-                android:layout_height="400dp"
-                android:src="@drawable/logo"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:contentDescription="Logo Syram"
-                app:layout_constraintTop_toTopOf="@+id/headerBackground"
-                app:layout_constraintBottom_toBottomOf="@+id/headerBackground"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:autofillHints="emailAddress"
+        android:background="@drawable/bg_input_rounded"
+        android:elevation="4dp"
+        android:hint="@string/hint_email"
+        android:inputType="textEmailAddress"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/wireframe_text_hint"
+        app:layout_constraintBottom_toTopOf="@+id/etPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle" />
 
-            <TextView
-                android:id="@+id/tvLoginTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SYRAM"
-                android:textColor="@color/syam_green_dark"
-                android:textSize="32sp"
-                android:textStyle="bold"
-                android:layout_marginTop="24dp"
-                app:layout_constraintTop_toBottomOf="@+id/headerBackground"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:autofillHints="password"
+        android:background="@drawable/bg_input_rounded"
+        android:elevation="4dp"
+        android:hint="@string/hint_password"
+        android:inputType="textPassword"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/wireframe_text_hint"
+        app:layout_constraintBottom_toTopOf="@+id/btnLogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
 
-            <!-- Input Email -->
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_input_rounded"
-                android:elevation="2dp"
-                android:hint="Masukkan email"
-                android:inputType="textEmailAddress"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:textColorHint="@color/wireframe_text_hint"
-                android:textColor="@color/black"
-                android:autofillHints="emailAddress"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvLoginTitle" />
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/bg_tombol_hijau"
+        android:elevation="4dp"
+        android:text="@string/btn_login_text"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toTopOf="@+id/tvOR"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
-            <!-- Input Password -->
-            <EditText
-                android:id="@+id/etPassword"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_input_rounded"
-                android:elevation="2dp"
-                android:hint="Masukkan password"
-                android:inputType="textPassword"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:textColorHint="@color/wireframe_text_hint"
-                android:textColor="@color/black"
-                android:autofillHints="password"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etEmail" />
+    <TextView
+        android:id="@+id/tvOR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/or_text"
+        android:textColor="@color/syam_green_medium"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btnGoogleLogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
-            <!-- Tombol Login -->
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_tombol_hijau"
-                app:backgroundTint="@null"
-                android:text="Login"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+    <View
+        android:id="@+id/separatorLeft"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="12dp"
+        android:background="@color/syam_green_medium"
+        app:layout_constraintBottom_toBottomOf="@+id/tvOR"
+        app:layout_constraintEnd_toStartOf="@+id/tvOR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvOR" />
 
-            <View
-                android:id="@+id/separatorLeft"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginStart="64dp"
-                android:layout_marginEnd="12dp"
-                android:background="@color/syam_green_medium"
-                app:layout_constraintBottom_toBottomOf="@+id/tvOR"
-                app:layout_constraintEnd_toStartOf="@+id/tvOR"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tvOR" />
+    <View
+        android:id="@+id/separatorRight"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="64dp"
+        android:background="@color/syam_green_medium"
+        app:layout_constraintBottom_toBottomOf="@+id/tvOR"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvOR"
+        app:layout_constraintTop_toTopOf="@+id/tvOR" />
 
-            <TextView
-                android:id="@+id/tvOR"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="OR"
-                android:textColor="@color/syam_green_medium"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
-
-            <View
-                android:id="@+id/separatorRight"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="64dp"
-                android:background="@color/syam_green_medium"
-                app:layout_constraintBottom_toBottomOf="@+id/tvOR"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tvOR"
-                app:layout_constraintTop_toTopOf="@+id/tvOR" />
-
-            <Button
-                android:id="@+id/btnGoogleLogin"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:background="@drawable/bg_tombol_hijau"
-                app:backgroundTint="@null"
-                android:text="Login dengan Google"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="normal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvOR" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    <Button
+        android:id="@+id/btnGoogleLogin"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/bg_tombol_hijau"
+        android:elevation="4dp"
+        android:text="@string/btn_google_login_text"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvOR" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

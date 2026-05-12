@@ -6,15 +6,17 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +24,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -30,8 +31,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Random;
 
@@ -49,19 +50,19 @@ public class AktivitasLogin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Auto-login check
+        SharedPreferences pref = getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
+        if (!pref.getString("email", "").isEmpty()) {
+            goToDashboard();
+            return;
+        }
+
         setContentView(R.layout.tampilan_login);
-
         dbHelper = new DatabaseHelper(this);
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken("630428215938-77g4an5cl3hchjkeua2jpgt4s0naccap.apps.googleusercontent.com")
-                .build();
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        initViews();
+        setupGoogleSignIn();
+        startFinalAnimations();
 
         btnLogin.setOnClickListener(v -> {
             if (validateInput()) {
@@ -76,11 +77,26 @@ public class AktivitasLogin extends AppCompatActivity {
         });
     }
 
+    private void initViews() {
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
+    }
+
+    private void setupGoogleSignIn() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
+
     private boolean validateInput() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Mohon isi semua field", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Isi semua data!", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -117,60 +133,39 @@ public class AktivitasLogin extends AppCompatActivity {
                 Bitmap fullBitmap = ((BitmapDrawable) ivPuzzleBg.getDrawable()).getBitmap();
                 int viewW = ivPuzzleBg.getWidth();
                 int viewH = ivPuzzleBg.getHeight();
+                float scale = (fullBitmap.getWidth() * viewH > viewW * fullBitmap.getHeight()) ? 
+                        (float) viewH / (float) fullBitmap.getHeight() : (float) viewW / (float) fullBitmap.getWidth();
+                float dx = (viewW - fullBitmap.getWidth() * scale) * 0.5f;
+                float dy = (viewH - fullBitmap.getHeight() * scale) * 0.5f;
 
-                // Hitung skala CenterCrop
-                float scale;
-                float dx = 0, dy = 0;
-                if (fullBitmap.getWidth() * viewH > viewW * fullBitmap.getHeight()) {
-                    scale = (float) viewH / (float) fullBitmap.getHeight();
-                    dx = (viewW - fullBitmap.getWidth() * scale) * 0.5f;
-                } else {
-                    scale = (float) viewW / (float) fullBitmap.getWidth();
-                    dy = (viewH - fullBitmap.getHeight() * scale) * 0.5f;
-                }
-
-                // Ukuran kepingan dalam pixel layar
                 int pieceSizePx = (int) (55 * density);
-                
-                // Koordinat crop pada gambar asli
                 int startXOnOriginal = (int) ((targetMarginXPx - dx) / scale);
                 int startYOnOriginal = (int) (((viewH / 2) - (pieceSizePx / 2) + targetMarginYPx - dy) / scale);
                 int sizeOnOriginal = (int) (pieceSizePx / scale);
 
-                // Pastikan tidak keluar batas gambar asli
                 startXOnOriginal = Math.max(0, Math.min(startXOnOriginal, fullBitmap.getWidth() - sizeOnOriginal));
                 startYOnOriginal = Math.max(0, Math.min(startYOnOriginal, fullBitmap.getHeight() - sizeOnOriginal));
 
-                // Potong dari gambar asli (Kualitas Tinggi)
                 Bitmap pieceBitmap = Bitmap.createBitmap(fullBitmap, startXOnOriginal, startYOnOriginal, sizeOnOriginal, sizeOnOriginal);
-                
-                // Scale kepingan hasil potong ke ukuran layar dengan filter berkualitas tinggi
                 Bitmap finalPiece = Bitmap.createScaledBitmap(pieceBitmap, pieceSizePx, pieceSizePx, true);
-                Bitmap maskedBitmap = getMaskedBitmap(finalPiece, R.drawable.ic_puzzle_piece);
-                
-                ivPuzzlePiece.setImageBitmap(maskedBitmap);
-                ivPuzzlePiece.clearColorFilter();
-                ivPuzzlePiece.setImageTintList(null);
-                
+                ivPuzzlePiece.setImageBitmap(getMaskedBitmap(finalPiece, R.drawable.ic_puzzle_piece));
             } catch (Exception e) { e.printStackTrace(); }
         });
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                float translationX = (progress / 100f) * (225 * density);
-                ivPuzzlePiece.setTranslationX(translationX);
+                ivPuzzlePiece.setTranslationX((progress / 100f) * (225 * density));
                 if (tvHint != null) tvHint.setAlpha(1 - (progress / 50f));
             }
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                float currentPosPx = ivPuzzlePiece.getTranslationX();
-                if (Math.abs(currentPosPx - targetMarginXPx) <= (10 * density)) {
+                if (Math.abs(ivPuzzlePiece.getTranslationX() - targetMarginXPx) <= (10 * density)) {
                     ivPuzzlePiece.setTranslationX(targetMarginXPx);
                     ivPuzzlePiece.setColorFilter(Color.parseColor("#4CAF50"), PorterDuff.Mode.SRC_ATOP);
                     Toast.makeText(AktivitasLogin.this, "Verifikasi Berhasil!", Toast.LENGTH_SHORT).show();
-                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    new Handler().postDelayed(() -> {
                         if (captchaDialog != null) captchaDialog.dismiss();
                         if (isPendingGoogleLogin) signInWithGoogle();
                         else handleLogin();
@@ -178,7 +173,6 @@ public class AktivitasLogin extends AppCompatActivity {
                 } else {
                     seekBar.setProgress(0);
                     ivPuzzlePiece.setTranslationX(0);
-                    if (tvHint != null) tvHint.setAlpha(1f);
                 }
             }
         });
@@ -186,16 +180,12 @@ public class AktivitasLogin extends AppCompatActivity {
     }
 
     private Bitmap getMaskedBitmap(Bitmap source, int maskResId) {
-        int width = source.getWidth();
-        int height = source.getHeight();
-        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(result);
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        Drawable maskDrawable = ContextCompat.getDrawable(this, maskResId);
-        maskDrawable.setBounds(0, 0, width, height);
-        maskDrawable.draw(canvas);
-
+        Drawable mask = ContextCompat.getDrawable(this, maskResId);
+        mask.setBounds(0, 0, source.getWidth(), source.getHeight());
+        mask.draw(canvas);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(source, 0, 0, paint);
         return result;
@@ -205,45 +195,59 @@ public class AktivitasLogin extends AppCompatActivity {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
         if (dbHelper.checkUser(email, password)) {
-            loginSuccess(email, dbHelper.getUserName(email));
+            saveEmailToPref(email);
+            Toast.makeText(this, "Selamat datang, " + dbHelper.getUserName(email), Toast.LENGTH_SHORT).show();
+            goToDashboard();
         } else {
             Toast.makeText(this, "Email atau Password salah!", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void signInWithGoogle() {
-        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
-            startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
-        });
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN));
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            try {
+                GoogleSignInAccount account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class);
+                if (account != null && dbHelper.isEmailExists(account.getEmail())) {
+                    saveEmailToPref(account.getEmail());
+                    goToDashboard();
+                } else {
+                    mGoogleSignInClient.signOut();
+                    Toast.makeText(this, "Email tidak terdaftar!", Toast.LENGTH_SHORT).show();
+                }
+            } catch (ApiException e) { Toast.makeText(this, "Google Error", Toast.LENGTH_SHORT).show(); }
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            if (dbHelper.isEmailExists(account.getEmail())) {
-                loginSuccess(account.getEmail(), dbHelper.getUserName(account.getEmail()));
-            } else {
-                mGoogleSignInClient.signOut();
-                Toast.makeText(this, "Email Google tidak terdaftar!", Toast.LENGTH_LONG).show();
-            }
-        } catch (ApiException e) { Toast.makeText(this, "Gagal login Google", Toast.LENGTH_SHORT).show(); }
+    private void saveEmailToPref(String email) {
+        getSharedPreferences("SyamPref", Context.MODE_PRIVATE).edit().putString("email", email).apply();
     }
 
-    private void loginSuccess(String email, String name) {
-        SharedPreferences.Editor editor = getSharedPreferences("SyamPref", Context.MODE_PRIVATE).edit();
-        editor.putString("email", email);
-        editor.apply();
-        Toast.makeText(this, "Selamat datang, " + name, Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(AktivitasLogin.this, DashboardActivity.class));
+    private void goToDashboard() {
+        startActivity(new Intent(this, DashboardActivity.class));
         finish();
+    }
+
+    private void startFinalAnimations() {
+        View header = findViewById(R.id.headerBackground);
+        View logo = findViewById(R.id.ivLogo);
+        View title = findViewById(R.id.tvLoginTitle);
+        View orLine = findViewById(R.id.tvOR);
+        View sepL = findViewById(R.id.separatorLeft);
+        View sepR = findViewById(R.id.separatorRight);
+        if (header == null) return;
+        final View[] forms = {title, etEmail, etPassword, btnLogin, orLine, sepL, sepR, btnGoogleLogin};
+        header.setTranslationY(-1000f);
+        logo.setAlpha(0f);
+        logo.setTranslationY(-500f);
+        for (View v : forms) { if (v != null) { v.setAlpha(0f); v.setTranslationY(-300f); } }
+        header.animate().translationY(0).setDuration(900).setInterpolator(new DecelerateInterpolator()).start();
+        new Handler().postDelayed(() -> logo.animate().alpha(1f).translationY(0).scaleX(1f).scaleY(1f).setDuration(1000).setInterpolator(new OvershootInterpolator(1.2f)).start(), 400);
+        for (int i = 0; i < forms.length; i++) { if (forms[i] != null) forms[i].animate().alpha(1f).translationY(0).setDuration(700).setStartDelay(800 + (i * 80)).start(); }
     }
 }

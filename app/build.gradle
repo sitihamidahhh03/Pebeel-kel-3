@@ -4,18 +4,15 @@ plugins {
 }
 
 android {
-    namespace 'com.example.monika'
-
-    // Diperlukan compileSdk 36 karena versi library (seperti androidx.activity) yang digunakan sangat baru
+    namespace 'com.example.monika' // Kita tetap gunakan namespace ini agar tidak perlu refactor semua file Java
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.example.monika"
+        applicationId "com.syram.monika" // ID BARU YANG UNIK
         minSdk 26
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,11 +37,14 @@ dependencies {
     implementation libs.gson
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+    implementation 'com.google.android.gms:play-services-auth:21.3.0'
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    
+    // Firebase
     implementation platform('com.google.firebase:firebase-bom:33.0.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-auth'
 }

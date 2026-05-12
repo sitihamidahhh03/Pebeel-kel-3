@@ -1,11 +1,26 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.MoNiKa" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/syam_green_dark</item>
-        <!-- Customize your light theme here. -->
+    <!-- Tema Utama untuk Mode Malam -->
+    <style name="Base.Theme.MoNiKa" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Warna Utama -->
         <item name="colorPrimary">@color/syam_green_dark</item>
         <item name="colorPrimaryVariant">@color/syam_green_dark</item>
         <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Warna Wajib Material Components -->
+        <item name="colorSurface">#121212</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSecondary">@color/syam_green_medium</item>
+        <item name="colorOnSecondary">#000000</item>
+
+        <!-- Picker Dialog Theme dihapus agar tidak error resource linking -->
+
+        <!-- Atribut agar Button tidak Crash -->
+        <item name="textAppearanceButton">@style/TextAppearance.MaterialComponents.Button</item>
+        <item name="materialButtonStyle">@style/Widget.MaterialComponents.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.MaterialComponents.Button.OutlinedButton</item>
+
+        <item name="android:statusBarColor">@color/syam_green_dark</item>
     </style>
+
+    <style name="Theme.MoNiKa" parent="Base.Theme.MoNiKa" />
 </resources>

@@ -6,43 +6,43 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:padding="16dp"
+        android:padding="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- TITLE + BUTTON -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:text="Alarm Pengingat"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:layout_weight="1"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:textColor="#3E4D35"/>
 
             <ImageView
                 android:id="@+id/btnAdd"
                 android:src="@android:drawable/ic_input_add"
-                android:layout_width="32dp"
-                android:layout_height="32dp"/>
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="4dp"
+                android:background="@drawable/bg_lingkaran_abu"/>
         </LinearLayout>
 
-        <!-- DESKRIPSI -->
         <TextView
-            android:text="Tambah alarm pengingat agar tanaman tidak kurang kelembaban"
+            android:text="Tambah alarm agar Anda tidak lupa menyiram tanaman."
             android:textSize="14sp"
             android:textColor="#888888"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="24dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <!-- CONTAINER ALARM -->
         <LinearLayout
             android:id="@+id/containerAlarm"
             android:layout_width="match_parent"

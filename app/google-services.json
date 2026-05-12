@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "527758994039",
+    "firebase_url": "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "syram-iot",
     "storage_bucket": "syram-iot.firebasestorage.app"
   },
@@ -9,10 +10,23 @@
       "client_info": {
         "mobilesdk_app_id": "1:527758994039:android:d745607254955e48907472",
         "android_client_info": {
-          "package_name": "com.example.monika"
+          "package_name": "com.syram.monika"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "527758994039-im0png716ah0gea19k29ob4s1nk98fpp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.syram.monika",
+            "certificate_hash": "241c70a8ad92c21c157c5fe7b4c9a67b145a10fd"
+          }
+        },
+        {
+          "client_id": "527758994039-7hhl7v2m97cmq5479s0l6im8m6avi16g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAr52fg1XoyZ-H4-zfSM-rFYRXDwJI_9kQ"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527758994039-7hhl7v2m97cmq5479s0l6im8m6avi16g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

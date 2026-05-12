@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Status: Disabled & Tercentang (Mode Otomatis) -->
+    <item android:alpha="0.4" android:color="@color/syam_green_medium" android:state_enabled="false" android:state_checked="true" />
+    <item android:alpha="0.2" android:color="#000000" android:state_enabled="false" android:state_checked="false" />
+
+    <!-- Status: Enabled & Tercentang (Mode Manual ON) -->
+    <item android:color="@color/syam_green_medium" android:state_checked="true" />
+
+    <!-- Status: Default / Off -->
+    <item android:color="#33000000" android:state_checked="false" />
+</selector>

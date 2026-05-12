@@ -19,7 +19,7 @@
             android:orientation="vertical"
             android:padding="10dp">
 
-            <!-- WIDGET CUACA (BARU) -->
+            <!-- WIDGET CUACA -->
             <include layout="@layout/layout_cuaca" />
 
             <include layout="@layout/layout_monitoring_tanah" />
@@ -28,7 +28,7 @@
                 android:id="@+id/cardSaran"
                 layout="@layout/komponen_saran_dashboard" />
 
-            <include layout="@layout/layout_button_siram" />
+            <!-- Tombol siram dan mode otomatis dihapus dari dashboard sesuai permintaan -->
 
         </LinearLayout>
     </ScrollView>

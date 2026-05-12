@@ -17,14 +17,15 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         switch (position) {
             case 0: return new DashboardFragment();
             case 1: return new GrafikFragment();
-            case 2: return new AlarmFragment();
-            case 3: return new NotificationFragment();
+            case 2: return new ControlFragment(); // Halaman Kontu (Penyiraman & Kipas)
+            case 3: return new AlarmFragment();
+            case 4: return new NotificationFragment();
             default: return new DashboardFragment();
         }
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 5; // Bertambah jadi 5 halaman
     }
 }

@@ -19,12 +19,10 @@ public class NotificationFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Menggunakan layout fragment_notification yang baru (bersih tanpa header/footer ganda)
+        // Menggunakan layout fragment_notification yang sudah dibersihkan
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
 
         historyContainer = view.findViewById(R.id.container_riwayat_notif);
-        
-        setupCardDropdowns(view);
         displayNotificationHistory();
 
         return view;
@@ -67,24 +65,6 @@ public class NotificationFragment extends Fragment {
             }
 
             historyContainer.addView(cardView);
-        }
-    }
-
-    private void setupCardDropdowns(View view) {
-        View headerRendah = view.findViewById(R.id.header_rendah);
-        View contentRendah = view.findViewById(R.id.content_rendah);
-        if (headerRendah != null && contentRendah != null) {
-            headerRendah.setOnClickListener(v -> {
-                contentRendah.setVisibility(contentRendah.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-            });
-        }
-
-        View headerTinggi = view.findViewById(R.id.header_tinggi);
-        View contentTinggi = view.findViewById(R.id.content_tinggi);
-        if (headerTinggi != null && contentTinggi != null) {
-            headerTinggi.setOnClickListener(v -> {
-                contentTinggi.setVisibility(contentTinggi.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
-            });
         }
     }
     

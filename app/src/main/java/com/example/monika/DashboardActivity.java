@@ -49,10 +49,15 @@ public class DashboardActivity extends AppCompatActivity {
                 footer.setActiveMenu(R.id.indicator_chart);
                 break;
             case 2:
+                // Mengubah judul sesuai permintaan user
+                header.setHeaderTitle("Monitoring Aktuator");
+                footer.setActiveMenu(R.id.indicator_control);
+                break;
+            case 3:
                 header.setHeaderTitle("Pengingat");
                 footer.setActiveMenu(R.id.indicator_alarm);
                 break;
-            case 3:
+            case 4:
                 header.setHeaderTitle("Notifikasi");
                 footer.setActiveMenu(R.id.indicator_bell);
                 break;
