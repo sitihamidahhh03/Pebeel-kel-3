@@ -8,8 +8,8 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.monika" />
-                  <option name="mobileSdkAppId" value="1:527758994039:android:d745607254955e48907472" />
+                  <option name="appId" value="com.syram.monika" />
+                  <option name="mobileSdkAppId" value="1:527758994039:android:14c532cb4134a020907472" />
                   <option name="projectId" value="syram-iot" />
                   <option name="projectNumber" value="527758994039" />
                 </ConnectionSetting>

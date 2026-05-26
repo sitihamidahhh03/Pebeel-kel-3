@@ -44,12 +44,16 @@ public class AktivitasProfil extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DatabaseHelper dbHelper;
 
+    private Uri cropResultUri;
+
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
-                    startCrop(imageUri);
+                    if (imageUri != null) {
+                        startCrop(imageUri);
+                    }
                 }
             }
     );
@@ -57,15 +61,22 @@ public class AktivitasProfil extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> cropImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Bundle extras = result.getData().getExtras();
-                    if (extras != null) {
-                        Bitmap bitmap = extras.getParcelable("data");
-                        if (bitmap != null) {
-                            saveBitmapToInternalStorage(bitmap);
-                        } else {
-                            Uri croppedUri = result.getData().getData();
-                            if (croppedUri != null) saveImageToInternalStorage(croppedUri);
+                if (result.getResultCode() == RESULT_OK) {
+                    // 1. Coba ambil dari URI hasil crop (paling stabil)
+                    if (cropResultUri != null) {
+                        saveImageToInternalStorage(cropResultUri);
+                        return;
+                    }
+
+                    // 2. Fallback: Coba ambil dari extras jika URI null
+                    if (result.getData() != null) {
+                        Bundle extras = result.getData().getExtras();
+                        if (extras != null && extras.containsKey("data")) {
+                            Bitmap bitmap = extras.getParcelable("data");
+                            if (bitmap != null) {
+                                saveBitmapToInternalStorage(bitmap);
+                                return;
+                            }
                         }
                     }
                 }
@@ -88,7 +99,7 @@ public class AktivitasProfil extends AppCompatActivity {
         }
 
         String encodedEmail = userEmail.replace(".", ",");
-        // DISESUAIKAN: Path lowercase 'users'
+        // SESUAIKAN: Menggunakan 'users' (u kecil) sesuai dengan screenshot database Firebase Anda
         userRef = FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("users").child(encodedEmail);
 
@@ -185,6 +196,10 @@ public class AktivitasProfil extends AppCompatActivity {
 
     private void startCrop(Uri uri) {
         try {
+            // Buat file sementara untuk menampung hasil crop agar lebih stabil di semua HP
+            File cropFile = new File(getFilesDir(), "temp_crop_" + System.currentTimeMillis() + ".jpg");
+            cropResultUri = Uri.fromFile(cropFile);
+
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
             cropIntent.setDataAndType(uri, "image/*");
             cropIntent.putExtra("crop", "true");
@@ -192,9 +207,16 @@ public class AktivitasProfil extends AppCompatActivity {
             cropIntent.putExtra("aspectY", 1);
             cropIntent.putExtra("outputX", 512);
             cropIntent.putExtra("outputY", 512);
-            cropIntent.putExtra("return-data", true);
+            cropIntent.putExtra("return-data", false); // Gunakan URI agar tidak pecah atau null
+            cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, cropResultUri);
+            
+            // Berikan izin akses URI
+            cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            cropIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            
             cropImageLauncher.launch(cropIntent);
         } catch (Exception e) {
+            // Jika fitur Crop sistem tidak tersedia, langsung simpan foto aslinya
             saveImageToInternalStorage(uri);
         }
     }
@@ -231,13 +253,18 @@ public class AktivitasProfil extends AppCompatActivity {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
             outputStream.close();
             String photoPath = file.getAbsolutePath();
-            userRef.child("photo_path").setValue(photoPath);
+            
+            // Simpan ke Firebase
+            userRef.child("photo_path").setValue(photoPath).addOnFailureListener(e -> {
+                Toast.makeText(AktivitasProfil.this, "Gagal sinkron ke Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+            
             dbHelper.updateUserPhoto(userEmail, photoPath);
             setProfileImage(photoPath);
             Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gagal menyimpan foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -254,13 +281,18 @@ public class AktivitasProfil extends AppCompatActivity {
             inputStream.close();
             outputStream.close();
             String photoPath = file.getAbsolutePath();
-            userRef.child("photo_path").setValue(photoPath);
+            
+            // Simpan ke Firebase
+            userRef.child("photo_path").setValue(photoPath).addOnFailureListener(e -> {
+                Toast.makeText(AktivitasProfil.this, "Gagal sinkron ke Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+            
             dbHelper.updateUserPhoto(userEmail, photoPath);
             setProfileImage(photoPath);
             Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(this, "Gagal memuat foto", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Gagal memuat foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

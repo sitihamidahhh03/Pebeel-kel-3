@@ -38,10 +38,14 @@ public class MonitoringManager {
     private DatabaseReference monitoringRef;
     private ValueEventListener monitoringListener;
     
-    private DatabaseReference modeRef;
-    private ValueEventListener modeListener;
+    private DatabaseReference modeRef, pompaRef, kipasRef;
+    private ValueEventListener modeListener, pompaListener, kipasListener;
     private String currentMode = "Manual";
     private int lastSoilValue = 0;
+    private String lastStatus = "";
+
+    private View layoutStatusManual, dotPompa, dotKipas;
+    private TextView tvStatusPompa, tvStatusKipas;
 
     public MonitoringManager(View rootView, WateringManager wateringManager) {
         this.activity = (Activity) rootView.getContext();
@@ -54,6 +58,12 @@ public class MonitoringManager {
         this.tvPesanSaran = rootView.findViewById(R.id.tvPesanSaran);
         this.ivIconPeringatan = rootView.findViewById(R.id.ivIconPeringatan);
         this.cardSaran = rootView.findViewById(R.id.cardSaran);
+
+        this.layoutStatusManual = rootView.findViewById(R.id.layoutStatusManual);
+        this.dotPompa = rootView.findViewById(R.id.dotPompa);
+        this.dotKipas = rootView.findViewById(R.id.dotKipas);
+        this.tvStatusPompa = rootView.findViewById(R.id.tvStatusPompa);
+        this.tvStatusKipas = rootView.findViewById(R.id.tvStatusKipas);
 
         createNotificationChannel();
         startMonitoring();
@@ -76,6 +86,8 @@ public class MonitoringManager {
         // DIKEMBALIKAN KE ASLINYA (KAPITAL)
         monitoringRef = FirebaseDatabase.getInstance(dbUrl).getReference("Sensor/Kelembapan");
         modeRef = FirebaseDatabase.getInstance(dbUrl).getReference("Kontrol/Mode");
+        pompaRef = FirebaseDatabase.getInstance(dbUrl).getReference("Kontrol/Pompa");
+        kipasRef = FirebaseDatabase.getInstance(dbUrl).getReference("Kontrol/Kipas");
 
         monitoringListener = new ValueEventListener() {
             @Override
@@ -109,6 +121,9 @@ public class MonitoringManager {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     currentMode = snapshot.getValue(String.class);
+                    if (layoutStatusManual != null) {
+                        layoutStatusManual.setVisibility("Manual".equalsIgnoreCase(currentMode) ? View.VISIBLE : View.GONE);
+                    }
                     updateDisplay(lastSoilValue);
                 }
             }
@@ -117,6 +132,63 @@ public class MonitoringManager {
             public void onCancelled(@NonNull DatabaseError error) {}
         };
         modeRef.addValueEventListener(modeListener);
+
+        pompaListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isOn = "ON".equalsIgnoreCase(snapshot.getValue(String.class));
+                updateIndicator(dotPompa, tvStatusPompa, isOn, "#448AFF");
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        };
+        pompaRef.addValueEventListener(pompaListener);
+
+        kipasListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean isOn = "ON".equalsIgnoreCase(snapshot.getValue(String.class));
+                updateIndicator(dotKipas, tvStatusKipas, isOn, "#FF9800");
+            }
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
+        };
+        kipasRef.addValueEventListener(kipasListener);
+    }
+
+    private void updateIndicator(View dot, TextView text, boolean isActive, String activeColor) {
+        if (dot == null || text == null) return;
+        if (isActive) {
+            dot.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(activeColor)));
+            text.setTextColor(Color.parseColor(activeColor));
+            text.setTypeface(null, android.graphics.Typeface.BOLD);
+        } else {
+            dot.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
+            text.setTextColor(Color.parseColor("#757575"));
+            text.setTypeface(null, android.graphics.Typeface.NORMAL);
+        }
+    }
+
+    private void sendSystemNotification(String title, String message, String status) {
+        Intent intent = new Intent(activity, DashboardActivity.class);
+        intent.putExtra("OPEN_STATUS", status);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        PendingIntent pi = PendingIntent.getActivity(activity, status.hashCode(), intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
+                .setSmallIcon(R.drawable.logo)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pi)
+                .setAutoCancel(true);
+
+        NotificationManager nm = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) nm.notify(101, builder.build());
+
+        // Simpan ke riwayat lokal agar muncul di halaman riwayat Notifikasi
+        NotificationRepository.addNotification(activity, title, message, status);
     }
 
     private void updateDisplay(int value) {
@@ -135,6 +207,9 @@ public class MonitoringManager {
             status = "Kering";
             saran = "Tanah mulai kering (" + value + "%). Cabai butuh kelembaban 60-80%. Tindakan: Segera nyalakan penyiraman.";
             color = Color.parseColor("#FF5252"); 
+            if (!lastStatus.equals("Kering")) {
+                sendSystemNotification("SYRAM: Kelembaban Rendah!", saran, "KERING");
+            }
         } else if (value <= 80) {
             status = "Optimal";
             saran = "Kondisi ideal untuk cabai (" + value + "%). Pertumbuhan maksimal karena kebutuhan air terpenuhi.";
@@ -143,11 +218,19 @@ public class MonitoringManager {
             status = "Basah";
             saran = "Tanah cukup basah (" + value + "%). Pantau terus agar tidak terjadi genangan air berkepanjangan.";
             color = Color.parseColor("#448AFF"); 
+            if (!lastStatus.equals("Basah")) {
+                sendSystemNotification("SYRAM: Tanah Basah", saran, "TINGGI");
+            }
         } else {
-            status = "Optimal"; // Mengikuti logika asli user
+            status = "Banjir";
             saran = "Tanah tergenang (" + value + "%). Berisiko menyebabkan pembusukan akar. Tindakan: Hentikan penyiraman.";
             color = Color.parseColor("#795548"); 
+            if (!lastStatus.equals("Banjir")) {
+                sendSystemNotification("SYRAM: PERINGATAN BANJIR!", saran, "BANJIR");
+            }
         }
+
+        lastStatus = status;
 
         if (tvModeStatus != null) {
             tvModeStatus.setText("Mode: " + currentMode);
@@ -171,5 +254,7 @@ public class MonitoringManager {
     public void stopMonitoring() {
         if (monitoringRef != null && monitoringListener != null) monitoringRef.removeEventListener(monitoringListener);
         if (modeRef != null && modeListener != null) modeRef.removeEventListener(modeListener);
+        if (pompaRef != null && pompaListener != null) pompaRef.removeEventListener(pompaListener);
+        if (kipasRef != null && kipasListener != null) kipasRef.removeEventListener(kipasListener);
     }
 }

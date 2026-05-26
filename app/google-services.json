@@ -10,12 +10,49 @@
       "client_info": {
         "mobilesdk_app_id": "1:527758994039:android:d745607254955e48907472",
         "android_client_info": {
+          "package_name": "com.example.monika"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "527758994039-7hhl7v2m97cmq5479s0l6im8m6avi16g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr52fg1XoyZ-H4-zfSM-rFYRXDwJI_9kQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "527758994039-7hhl7v2m97cmq5479s0l6im8m6avi16g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:527758994039:android:14c532cb4134a020907472",
+        "android_client_info": {
           "package_name": "com.syram.monika"
         }
       },
       "oauth_client": [
         {
-          "client_id": "527758994039-im0png716ah0gea19k29ob4s1nk98fpp.apps.googleusercontent.com",
+          "client_id": "527758994039-4ivgs0egjcrorgpk0dl4l05fes4mmmlj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.syram.monika",
+            "certificate_hash": "d70b1ee2e65e3341d3afdc3799794298336da301"
+          }
+        },
+        {
+          "client_id": "527758994039-hbe9o5mctuo3btt2dqfcfp2a2bbvq6ku.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.syram.monika",

@@ -122,6 +122,10 @@ public class ControlFragment extends Fragment {
             switchSiram.setEnabled(true);
             switchKipas.setEnabled(true);
 
+            // PAKSA MATI saat pindah dari Otomatis ke Manual
+            switchSiram.setChecked(false);
+            switchKipas.setChecked(false);
+
             if (pompaRef != null) pompaRef.setValue("OFF");
             if (kipasRef != null) kipasRef.setValue("OFF");
 
