@@ -3,17 +3,16 @@ package com.example.monika;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
+import com.example.monika.ui.HeaderManager;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -21,6 +20,10 @@ public class AddAlarm extends AppCompatActivity {
 
     private TextView tvTime;
     private EditText etLabel;
+    private Button btnSave;
+    private Button btnCancel;
+    private HeaderManager header;
+
     private int selectedHour = 0;
     private int selectedMinute = 0;
 
@@ -29,28 +32,28 @@ public class AddAlarm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_alarm);
 
-        // 1. Inisialisasi Views
-        TextView tvTitle = findViewById(R.id.tv_title_page);
+        // 1. Inisialisasi Header agar tombol kembali muncul dan berfungsi
+        header = new HeaderManager(this);
+        header.showBackButton(true);
+        header.showProfileIcon(false);
+
+        // 2. Inisialisasi Views
         tvTime = findViewById(R.id.tv_time);
         etLabel = findViewById(R.id.et_label);
-        Button btnSave = findViewById(R.id.btn_save);
-        Button btnCancel = findViewById(R.id.btn_cancel);
-        Button btnBack = findViewById(R.id.btn_back);
+        btnSave = findViewById(R.id.btn_save);
+        btnCancel = findViewById(R.id.btn_cancel);
 
-        // 2. Set waktu default
         Calendar calendar = Calendar.getInstance();
         selectedHour = calendar.get(Calendar.HOUR_OF_DAY);
         selectedMinute = calendar.get(Calendar.MINUTE);
         updateTimeDisplay();
 
-        // 3. Logika untuk Edit (Jika dipanggil dari ReadAlarm)
         Intent intent = getIntent();
         if (intent.hasExtra("index")) {
-            if (tvTitle != null) tvTitle.setText(R.string.title_edit_alarm);
-            if (btnSave != null) btnSave.setText(R.string.btn_update_alarm);
-
+            header.setHeaderTitle("Edit Alarm");
             String time = intent.getStringExtra("time");
             String label = intent.getStringExtra("label");
+
             if (time != null) {
                 tvTime.setText(time);
                 try {
@@ -60,37 +63,33 @@ public class AddAlarm extends AppCompatActivity {
                 } catch (Exception ignored) {}
             }
             if (etLabel != null) etLabel.setText(label);
+        } else {
+            header.setHeaderTitle("Tambah Alarm");
         }
 
-        // 4. Pasang Listener
-        tvTime.setOnClickListener(v -> showTimePicker());
+        if (tvTime != null) tvTime.setOnClickListener(v -> showTimePicker());
         if (btnSave != null) btnSave.setOnClickListener(v -> saveAlarm());
         if (btnCancel != null) btnCancel.setOnClickListener(v -> finish());
-        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
     }
 
     private void showTimePicker() {
-        // Menggunakan MaterialTimePicker untuk menghindari masalah tombol tidak terlihat
-        // Komponen ini mengikuti tema Material aplikasi Anda secara otomatis
-        MaterialTimePicker picker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_24H)
-                .setHour(selectedHour)
-                .setMinute(selectedMinute)
-                .setTitleText("Pilih Waktu Alarm")
-                .build();
-
-        picker.addOnPositiveButtonClickListener(v -> {
-            selectedHour = picker.getHour();
-            selectedMinute = picker.getMinute();
-            updateTimeDisplay();
-        });
-
-        picker.show(getSupportFragmentManager(), "MATERIAL_TIME_PICKER");
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view, hourOfDay, minute) -> {
+                    selectedHour = hourOfDay;
+                    selectedMinute = minute;
+                    updateTimeDisplay();
+                },
+                selectedHour,
+                selectedMinute,
+                true
+        );
+        timePickerDialog.show();
     }
 
     private void updateTimeDisplay() {
         String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
-        tvTime.setText(formattedTime);
+        if (tvTime != null) tvTime.setText(formattedTime);
     }
 
     private void saveAlarm() {
@@ -99,54 +98,54 @@ public class AddAlarm extends AppCompatActivity {
 
         if (label.isEmpty()) {
             etLabel.setError("Label harus diisi");
+            etLabel.requestFocus();
             return;
         }
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                startActivity(intent);
-                return;
-            }
-        }
-
-        setSystemAlarm(label);
+        setSystemAlarm(time, label);
 
         Intent resultIntent = new Intent();
         resultIntent.putExtra("time", time);
         resultIntent.putExtra("label", label);
+
         if (getIntent().hasExtra("index")) {
             resultIntent.putExtra("index", getIntent().getIntExtra("index", -1));
         }
+
         setResult(Activity.RESULT_OK, resultIntent);
+        Toast.makeText(this, "Alarm disetel: " + time, Toast.LENGTH_SHORT).show();
         finish();
     }
 
-    private void setSystemAlarm(String label) {
-        try {
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(this, AlarmReceiver.class);
-            intent.putExtra("alarm_label", label);
+    private void setSystemAlarm(String time, String label) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.putExtra("alarm_label", label);
+        
+        int alarmId = time.hashCode();
+        
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, 
+                alarmId, 
+                intent, 
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
 
-            int requestCode = selectedHour * 100 + selectedMinute;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+        calendar.set(Calendar.MINUTE, selectedMinute);
+        calendar.set(Calendar.SECOND, 0);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
 
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
-            calendar.set(Calendar.MINUTE, selectedMinute);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-
-            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-                calendar.add(Calendar.DAY_OF_MONTH, 1);
-            }
-
-            if (alarmManager != null) {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-            }
-        } catch (Exception ignored) {}
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.getTimeInMillis(),
+                    pendingIntent
+            );
+        }
     }
 }

@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -32,7 +33,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Random;
 
@@ -40,7 +45,7 @@ public class AktivitasLogin extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin, btnGoogleLogin;
-    private DatabaseHelper dbHelper;
+    private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 100;
     
@@ -50,19 +55,21 @@ public class AktivitasLogin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Auto-login check
-        SharedPreferences pref = getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
-        if (!pref.getString("email", "").isEmpty()) {
-            goToDashboard();
-            return;
-        }
-
+        
+        // 1. Tampilkan layout segera agar tombol bisa diinisialisasi dan di-klik
         setContentView(R.layout.tampilan_login);
-        dbHelper = new DatabaseHelper(this);
+        
+        mAuth = FirebaseAuth.getInstance();
         initViews();
         setupGoogleSignIn();
         startFinalAnimations();
+
+        // 2. Cek auto-login (dilakukan setelah UI siap)
+        SharedPreferences pref = getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
+        if (mAuth.getCurrentUser() != null && !pref.getString("email", "").isEmpty()) {
+            goToDashboard();
+            return;
+        }
 
         btnLogin.setOnClickListener(v -> {
             if (validateInput()) {
@@ -161,7 +168,7 @@ public class AktivitasLogin extends AppCompatActivity {
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (Math.abs(ivPuzzlePiece.getTranslationX() - targetMarginXPx) <= (10 * density)) {
+                if (Math.abs(ivPuzzlePiece.getTranslationX() - targetMarginXPx) <= (15 * density)) {
                     ivPuzzlePiece.setTranslationX(targetMarginXPx);
                     ivPuzzlePiece.setColorFilter(Color.parseColor("#4CAF50"), PorterDuff.Mode.SRC_ATOP);
                     Toast.makeText(AktivitasLogin.this, "Verifikasi Berhasil!", Toast.LENGTH_SHORT).show();
@@ -194,13 +201,43 @@ public class AktivitasLogin extends AppCompatActivity {
     private void handleLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
-        if (dbHelper.checkUser(email, password)) {
-            saveEmailToPref(email);
-            Toast.makeText(this, "Selamat datang, " + dbHelper.getUserName(email), Toast.LENGTH_SHORT).show();
-            goToDashboard();
-        } else {
-            Toast.makeText(this, "Email atau Password salah!", Toast.LENGTH_SHORT).show();
-        }
+        
+        mAuth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    checkUserInDatabase(email);
+                } else {
+                    String error = task.getException() != null ? task.getException().getMessage() : "Email atau Password salah!";
+                    Toast.makeText(AktivitasLogin.this, "Login Gagal: " + error, Toast.LENGTH_LONG).show();
+                }
+            });
+    }
+
+    private void checkUserInDatabase(String email) {
+        String encodedEmail = email.replace(".", ",");
+        // SESUAIKAN DENGAN STRUKTUR FIREBASE: node 'users' ada di root
+        FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("users") 
+                .child(encodedEmail)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        saveEmailToPref(email);
+                        updateLastLogin(email);
+                        Toast.makeText(AktivitasLogin.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
+                        goToDashboard();
+                    } else {
+                        // Tolak akses jika tidak ada di node 'users' database
+                        mAuth.signOut();
+                        Toast.makeText(AktivitasLogin.this, "Akses Ditolak: Akun tidak terdaftar di sistem!", Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void updateLastLogin(String email) {
+        // Node logs/last_login sesuai screenshot
+        FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("logs/last_login").setValue("User (" + email + ")");
     }
 
     private void signInWithGoogle() {
@@ -213,15 +250,28 @@ public class AktivitasLogin extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             try {
                 GoogleSignInAccount account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class);
-                if (account != null && dbHelper.isEmailExists(account.getEmail())) {
-                    saveEmailToPref(account.getEmail());
-                    goToDashboard();
-                } else {
-                    mGoogleSignInClient.signOut();
-                    Toast.makeText(this, "Email tidak terdaftar!", Toast.LENGTH_SHORT).show();
+                if (account != null) {
+                    firebaseAuthWithGoogle(account);
                 }
-            } catch (ApiException e) { Toast.makeText(this, "Google Error", Toast.LENGTH_SHORT).show(); }
+            } catch (ApiException e) { 
+                Toast.makeText(this, "Google Error: " + e.getMessage(), Toast.LENGTH_SHORT).show(); 
+            }
         }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+            .addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    if (user != null) {
+                        checkUserInDatabase(user.getEmail());
+                    }
+                } else {
+                    Toast.makeText(AktivitasLogin.this, "Firebase Authentication Gagal", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
 
     private void saveEmailToPref(String email) {

@@ -64,7 +64,6 @@ public class AktivitasProfil extends AppCompatActivity {
                         if (bitmap != null) {
                             saveBitmapToInternalStorage(bitmap);
                         } else {
-                            // Fallback jika bitmap null (beberapa perangkat mengembalikan Uri)
                             Uri croppedUri = result.getData().getData();
                             if (croppedUri != null) saveImageToInternalStorage(croppedUri);
                         }
@@ -89,8 +88,9 @@ public class AktivitasProfil extends AppCompatActivity {
         }
 
         String encodedEmail = userEmail.replace(".", ",");
+        // DISESUAIKAN: Path lowercase 'users'
         userRef = FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("Users").child(encodedEmail);
+                .getReference("users").child(encodedEmail);
 
         tvNamaUser = findViewById(R.id.tvNamaUser);
         tvEmailUser = findViewById(R.id.tvEmailUser);
@@ -135,7 +135,6 @@ public class AktivitasProfil extends AppCompatActivity {
         }
         File imgFile = new File(path);
         if (imgFile.exists()) {
-            // Gunakan BitmapFactory agar pemuatan lebih stabil dibanding setImageURI
             Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             if (myBitmap != null) {
                 ivFotoProfil.setImageBitmap(myBitmap);
@@ -150,8 +149,6 @@ public class AktivitasProfil extends AppCompatActivity {
 
     private void loadUserData() {
         tvEmailUser.setText(userEmail);
-        
-        // Load dari lokal dulu agar cepat
         setProfileImage(dbHelper.getUserPhoto(userEmail));
 
         userRef.addValueEventListener(new ValueEventListener() {
@@ -160,18 +157,14 @@ public class AktivitasProfil extends AppCompatActivity {
                 if (snapshot.exists() && !isFinishing()) {
                     String name = snapshot.child("name").getValue(String.class);
                     String photoPath = snapshot.child("photo_path").getValue(String.class);
-                    
                     tvNamaUser.setText(name != null ? name : "User");
-                    
                     if (photoPath != null && !photoPath.isEmpty()) {
                         setProfileImage(photoPath);
                         dbHelper.updateUserPhoto(userEmail, photoPath);
                     }
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            @Override public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -237,11 +230,9 @@ public class AktivitasProfil extends AppCompatActivity {
             FileOutputStream outputStream = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
             outputStream.close();
-
             String photoPath = file.getAbsolutePath();
             userRef.child("photo_path").setValue(photoPath);
             dbHelper.updateUserPhoto(userEmail, photoPath);
-            
             setProfileImage(photoPath);
             Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
@@ -262,11 +253,9 @@ public class AktivitasProfil extends AppCompatActivity {
             }
             inputStream.close();
             outputStream.close();
-            
             String photoPath = file.getAbsolutePath();
             userRef.child("photo_path").setValue(photoPath);
             dbHelper.updateUserPhoto(userEmail, photoPath);
-            
             setProfileImage(photoPath);
             Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {

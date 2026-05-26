@@ -1,4 +1,3 @@
-// AlarmReceiver.java
 package com.example.monika;
 
 import android.app.NotificationChannel;
@@ -7,14 +6,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 public class AlarmReceiver extends BroadcastReceiver {
-    private static final String CHANNEL_ID = "syram_alarm_channel"; 
+    private static final String CHANNEL_ID = "syram_notifications"; // Gunakan channel yang sama dengan monitoring
     private static final int NOTIFICATION_ID = 1001;
 
     @Override
@@ -26,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         String message = "Waktunya " + alarmLabel + " - pastikan kelembaban tanah cukup!";
 
-        // 1. Simpan ke riwayat notifikasi aplikasi
+        // 1. Simpan ke riwayat notifikasi aplikasi (Instagram style)
         NotificationRepository.addNotification(context, "Alarm Pengingat", message, "ALARM");
 
         // 2. Buat Notification Channel (untuk Android Oreo ke atas)
@@ -38,27 +34,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            if (soundUri == null) {
-                soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            }
-
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
-                    "Alarm Pengingat",
+                    "SYRAM Notifications",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Channel untuk alarm pengingat penyiraman");
-            
-            // Set sound for the channel
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .build();
-            channel.setSound(soundUri, audioAttributes);
-            channel.enableVibration(true);
-            channel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-
             NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
@@ -67,11 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void showNotification(Context context, String alarmLabel, String message) {
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if (soundUri == null) {
-            soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }
-
+        // Intent untuk masuk ke halaman Notifikasi saat notif di-klik
         Intent notificationIntent = new Intent(context, NotificationActivity.class);
         notificationIntent.putExtra("OPEN_STATUS", "ALARM");
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -85,14 +61,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo)
-                .setContentTitle("Alarm Pengingat: " + alarmLabel)
+                .setContentTitle("Alarm Pengingat")
                 .setContentText(message)
+                // --- TAMBAHKAN PANAH (BigTextStyle) agar teks bisa dibaca lengkap ---
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                // -------------------------------------------------------------------
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setSound(soundUri)
-                .setVibrate(new long[]{0, 1000, 500, 1000})
-                .setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent) // Menghubungkan ke halaman notifikasi
                 .setAutoCancel(true);
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

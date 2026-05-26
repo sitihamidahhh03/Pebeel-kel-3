@@ -28,6 +28,7 @@ public class ControlFragment extends Fragment {
     // Firebase
     private DatabaseReference pompaRef;
     private DatabaseReference kipasRef;
+    private DatabaseReference modeRef;
     private final String dbUrl = "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
     @Nullable
@@ -50,19 +51,20 @@ public class ControlFragment extends Fragment {
         ivSiram = view.findViewById(R.id.ivSiram);
         ivKipas = view.findViewById(R.id.ivKipas);
 
-        // Inisialisasi Firebase
+        // Inisialisasi Firebase - DIKEMBALIKAN KE STRUKTUR ASLI (Kapital)
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance(dbUrl);
             pompaRef = database.getReference("Kontrol/Pompa");
             kipasRef = database.getReference("Kontrol/Kipas");
-            Log.d("FIREBASE_CONTROL", "Firebase initialized successfully");
+            modeRef = database.getReference("Kontrol/Mode");
+            Log.d("FIREBASE_CONTROL", "Firebase initialized successfully with original structure");
         } catch (Exception e) {
             Log.e("FIREBASE_CONTROL", "Error initializing Firebase: " + e.getMessage());
         }
 
         setupNavigation();
         setupSwitchListeners();
-        
+
         // Default awal: Mode Manual
         setMode(true);
     }
@@ -76,14 +78,7 @@ public class ControlFragment extends Fragment {
         if (switchSiram != null) {
             switchSiram.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isManualMode && pompaRef != null) {
-                    String status = isChecked ? "ON" : "OFF";
-                    pompaRef.setValue(status).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("FIREBASE_CONTROL", "Pompa set to " + status);
-                        } else {
-                            Log.e("FIREBASE_CONTROL", "Failed to set Pompa: " + task.getException());
-                        }
-                    });
+                    pompaRef.setValue(isChecked ? "ON" : "OFF");
                 }
             });
         }
@@ -91,14 +86,7 @@ public class ControlFragment extends Fragment {
         if (switchKipas != null) {
             switchKipas.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isManualMode && kipasRef != null) {
-                    String status = isChecked ? "ON" : "OFF";
-                    kipasRef.setValue(status).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("FIREBASE_CONTROL", "Kipas set to " + status);
-                        } else {
-                            Log.e("FIREBASE_CONTROL", "Failed to set Kipas: " + task.getException());
-                        }
-                    });
+                    kipasRef.setValue(isChecked ? "ON" : "OFF");
                 }
             });
         }
@@ -106,19 +94,23 @@ public class ControlFragment extends Fragment {
 
     private void setMode(boolean manual) {
         this.isManualMode = manual;
+
+        // Update Mode ke Firebase
+        if (modeRef != null) {
+            modeRef.setValue(manual ? "Manual" : "Otomatis");
+        }
+
         if (!isAdded()) return;
 
         int activeColor = ContextCompat.getColor(requireContext(), R.color.syam_green_dark);
         int lockedTextColor = Color.argb(120, 62, 78, 53); 
 
         if (manual) {
-            // UI Tab Manual Aktif
             tabManual.setBackgroundResource(R.drawable.bg_button_oval_white);
             tabManual.setTextColor(activeColor);
             tabOtomatis.setBackground(null);
             tabOtomatis.setTextColor(Color.WHITE);
 
-            // Warna Normal (Aktif)
             tvSiramLabel.setTextColor(activeColor);
             tvKipasLabel.setTextColor(activeColor);
             ivSiram.setAlpha(1.0f);
@@ -127,25 +119,18 @@ public class ControlFragment extends Fragment {
             tvSiramLabel.setText("Siram Manual");
             tvKipasLabel.setText("Kipas Manual");
 
-            // Update Switch: Bisa dipencet
             switchSiram.setEnabled(true);
             switchKipas.setEnabled(true);
-            
-            // Default saat masuk mode manual kita set OFF (atau sesuai keinginan)
-            switchSiram.setChecked(false);
-            switchKipas.setChecked(false);
-            
+
             if (pompaRef != null) pompaRef.setValue("OFF");
             if (kipasRef != null) kipasRef.setValue("OFF");
 
         } else {
-            // UI Tab Otomatis Aktif
             tabOtomatis.setBackgroundResource(R.drawable.bg_button_oval_white);
             tabOtomatis.setTextColor(activeColor);
             tabManual.setBackground(null);
             tabManual.setTextColor(Color.WHITE);
 
-            // Warna Penanda Tidak Bisa Dipencet (Disabled)
             tvSiramLabel.setTextColor(lockedTextColor);
             tvKipasLabel.setTextColor(lockedTextColor);
             ivSiram.setAlpha(0.6f); 
@@ -154,21 +139,13 @@ public class ControlFragment extends Fragment {
             tvSiramLabel.setText("Siram Otomatis");
             tvKipasLabel.setText("Kipas Otomatis");
 
-            // Update Switch: Otomatis Aktif (Checked) & Tidak bisa dipencet (Disabled)
             switchSiram.setChecked(true);
             switchKipas.setChecked(true);
             switchSiram.setEnabled(false);
             switchKipas.setEnabled(false);
 
-            // Update Firebase ke ON untuk mode otomatis
-            if (pompaRef != null) {
-                pompaRef.setValue("ON");
-            }
-            if (kipasRef != null) {
-                kipasRef.setValue("ON");
-            }
-            
-            Toast.makeText(getContext(), "Mode Otomatis: Semua Aktif", Toast.LENGTH_SHORT).show();
+            if (pompaRef != null) pompaRef.setValue("ON");
+            if (kipasRef != null) kipasRef.setValue("ON");
         }
     }
 }

@@ -30,13 +30,18 @@ public class MonitoringManager {
 
     private Activity activity;
     private ProgressBar progressBar;
-    private TextView tvStatus, tvPercentage, tvPesanSaran;
+    private TextView tvStatus, tvPercentage, tvPesanSaran, tvModeStatus;
     private ImageView ivIconPeringatan;
     private View cardSaran;
     private WateringManager wateringManager;
     private static final String CHANNEL_ID = "syram_notifications";
     private DatabaseReference monitoringRef;
     private ValueEventListener monitoringListener;
+    
+    private DatabaseReference modeRef;
+    private ValueEventListener modeListener;
+    private String currentMode = "Manual";
+    private int lastSoilValue = 0;
 
     public MonitoringManager(View rootView, WateringManager wateringManager) {
         this.activity = (Activity) rootView.getContext();
@@ -44,6 +49,7 @@ public class MonitoringManager {
         
         this.progressBar = rootView.findViewById(R.id.progressBar);
         this.tvStatus = rootView.findViewById(R.id.tvStatus);
+        this.tvModeStatus = rootView.findViewById(R.id.tvModeStatus);
         this.tvPercentage = rootView.findViewById(R.id.tvPercentage);
         this.tvPesanSaran = rootView.findViewById(R.id.tvPesanSaran);
         this.ivIconPeringatan = rootView.findViewById(R.id.ivIconPeringatan);
@@ -65,33 +71,11 @@ public class MonitoringManager {
         }
     }
 
-    private void sendSystemNotification(String title, String message, String status) {
-        Intent intent = new Intent(activity, DashboardActivity.class);
-        intent.putExtra("OPEN_STATUS", status);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        PendingIntent pi = PendingIntent.getActivity(activity, status.hashCode(), intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(pi)
-                .setAutoCancel(true);
-
-        NotificationManager nm = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (nm != null) nm.notify(101, builder.build());
-
-        NotificationRepository.addNotification(activity, title, message, status);
-    }
-
     private void startMonitoring() {
         String dbUrl = "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        // Tahap 2 & 3: Read Real-time dari node Sensor/Kelembapan
+        // DIKEMBALIKAN KE ASLINYA (KAPITAL)
         monitoringRef = FirebaseDatabase.getInstance(dbUrl).getReference("Sensor/Kelembapan");
+        modeRef = FirebaseDatabase.getInstance(dbUrl).getReference("Kontrol/Mode");
 
         monitoringListener = new ValueEventListener() {
             @Override
@@ -107,6 +91,7 @@ public class MonitoringManager {
                         } else if (val instanceof String) {
                             value = Integer.parseInt((String) val);
                         }
+                        lastSoilValue = value;
                         updateDisplay(value);
                     } catch (Exception e) {
                         Log.e("FIREBASE_READ", "Error parsing: " + e.getMessage());
@@ -115,11 +100,23 @@ public class MonitoringManager {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("FIREBASE_READ", "Gagal baca: " + error.getMessage());
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         };
         monitoringRef.addValueEventListener(monitoringListener);
+
+        modeListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    currentMode = snapshot.getValue(String.class);
+                    updateDisplay(lastSoilValue);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        };
+        modeRef.addValueEventListener(modeListener);
     }
 
     private void updateDisplay(int value) {
@@ -138,7 +135,6 @@ public class MonitoringManager {
             status = "Kering";
             saran = "Tanah mulai kering (" + value + "%). Cabai butuh kelembaban 60-80%. Tindakan: Segera nyalakan penyiraman.";
             color = Color.parseColor("#FF5252"); 
-            sendSystemNotification("SYRAM: Kelembaban Rendah!", saran, "KERING");
         } else if (value <= 80) {
             status = "Optimal";
             saran = "Kondisi ideal untuk cabai (" + value + "%). Pertumbuhan maksimal karena kebutuhan air terpenuhi.";
@@ -147,12 +143,14 @@ public class MonitoringManager {
             status = "Basah";
             saran = "Tanah cukup basah (" + value + "%). Pantau terus agar tidak terjadi genangan air berkepanjangan.";
             color = Color.parseColor("#448AFF"); 
-            sendSystemNotification("SYRAM: Tanah Basah", saran, "TINGGI");
         } else {
-            status = "Banjir";
+            status = "Optimal"; // Mengikuti logika asli user
             saran = "Tanah tergenang (" + value + "%). Berisiko menyebabkan pembusukan akar. Tindakan: Hentikan penyiraman.";
             color = Color.parseColor("#795548"); 
-            sendSystemNotification("SYRAM: PERINGATAN BANJIR!", saran, "BANJIR");
+        }
+
+        if (tvModeStatus != null) {
+            tvModeStatus.setText("Mode: " + currentMode);
         }
 
         tvStatus.setText(status);
@@ -165,11 +163,13 @@ public class MonitoringManager {
         if (wateringManager != null) {
             wateringManager.checkAutoWatering(value);
         }
+        
+        // Update Kondisi ke Firebase sesuai path asli
+        monitoringRef.getParent().child("kondisi").setValue(status);
     }
 
     public void stopMonitoring() {
-        if (monitoringRef != null && monitoringListener != null) {
-            monitoringRef.removeEventListener(monitoringListener);
-        }
+        if (monitoringRef != null && monitoringListener != null) monitoringRef.removeEventListener(monitoringListener);
+        if (modeRef != null && modeListener != null) modeRef.removeEventListener(modeListener);
     }
 }

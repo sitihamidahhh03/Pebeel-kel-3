@@ -2,32 +2,21 @@
 <resources>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-
-    <!-- Warna Utama dari Gambar Referensi -->
-    <color name="syam_green_dark">#3E4E35</color> <!-- Hijau gelap di header/footer -->
-    <color name="syam_green_medium">#8BA870</color> <!-- Hijau sedang untuk teks tanggal -->
-    <color name="syam_green_light">#EAF2E1</color> <!-- Hijau sangat muda untuk background layar -->
-
-    <color name="warning_yellow">#FFC107</color> <!-- Warna Kuning Peringatan -->
-
-    <color name="wireframe_text_hint">#808080</color>
-    <color name="palette_google_red">#EA4335</color>
-
-    <!-- Menambahkan kembali warna yang dibutuhkan oleh file drawable lain agar tidak error -->
-    <color name="palette_button_teal">#008080</color>
-    <color name="wireframe_content_bg">@color/syam_green_light</color>
-    <color name="palette_header_dark">@color/syam_green_dark</color>
-
-    <!-- Warna Persis sesuai Gambar Login & Dashboard -->
-    <color name="syram_primary_dark">#424E36</color> <!-- Hijau botol gelap (Tombol Login) -->
-    <color name="syram_bg_main">#E6EDE3</color>      <!-- Hijau pucat/krem (Background dashboard) -->
-    <color name="syram_text_title">#2E3B23</color>   <!-- Hijau sangat tua (Teks judul) -->
-
-    <color name="gray_text">#757575</color>
-
-    <!-- Warna tambahan untuk memperbaiki error resource linking -->
+    <color name="syam_green_dark">#3E4E35</color>
+    <color name="syam_green_medium">#8BA870</color>
+    <color name="syam_green_light">#EAF2E1</color>
+    <color name="warning_yellow">#FFC107</color>
+    <color name="syram_primary_dark">#424E36</color>
+    <color name="syram_bg_main">#E6EDE3</color>
+    <color name="syram_text_title">#2E3B23</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
     <color name="success">#4CAF50</color>
     <color name="error">#F44336</color>
+
+    <!-- Missing colors added -->
+    <color name="palette_google_red">#EA4335</color>
+    <color name="palette_button_teal">#009688</color>
+    <color name="wireframe_content_bg">#F5F5F5</color>
+    <color name="wireframe_text_hint">#9E9E9E</color>
 </resources>

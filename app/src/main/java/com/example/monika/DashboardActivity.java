@@ -26,9 +26,9 @@ public class DashboardActivity extends AppCompatActivity {
 
         // 2. Footer Setup
         footer = new FooterManager(this);
-        footer.setPager(viewPager); // Hubungkan footer dengan ViewPager
+        footer.setPager(viewPager);
 
-        // 3. Sinkronisasi ViewPager ke Footer (saat digeser)
+        // 3. Sinkronisasi ViewPager ke Footer
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -49,7 +49,6 @@ public class DashboardActivity extends AppCompatActivity {
                 footer.setActiveMenu(R.id.indicator_chart);
                 break;
             case 2:
-                // Mengubah judul sesuai permintaan user
                 header.setHeaderTitle("Monitoring Aktuator");
                 footer.setActiveMenu(R.id.indicator_control);
                 break;

@@ -23,9 +23,9 @@ public class WateringManager {
         this.switchSiram = switchSiram;
         this.switchOtomatis = switchOtomatis;
         
-        // Inisialisasi Firebase - Pastikan Alamatnya Kapital: "Kontrol/Pompa"
+        // DISESUAIKAN: Path lowercase sesuai screenshot Firebase
         String dbUrl = "https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        pompaRef = FirebaseDatabase.getInstance(dbUrl).getReference("Kontrol/Pompa");
+        pompaRef = FirebaseDatabase.getInstance(dbUrl).getReference("Sensor/Pompa");
         
         initSwitch();
     }
@@ -36,18 +36,17 @@ public class WateringManager {
             switchSiram.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 updateSwitchUI(switchSiram, isChecked, "#8BAE66");
                 
-                // Tahap 4: Kirim status "ON" atau "OFF" ke Firebase
                 String status = isChecked ? "ON" : "OFF";
                 pompaRef.setValue(status).addOnSuccessListener(aVoid -> {
-                    Log.d("FIREBASE_WRITE", "Berhasil set Pompa ke: " + status);
+                    Log.d("FIREBASE_WRITE", "Berhasil set pompa ke: " + status);
                 }).addOnFailureListener(e -> {
                     Log.e("FIREBASE_WRITE", "Gagal update pompa: " + e.getMessage());
                 });
 
                 if (isChecked) {
-                    Toast.makeText(context, "Manual: Pompa Air NYALA 💧", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Penyiraman NYALA 💧", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "Manual: Pompa Air MATI 🛑", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Penyiraman MATI 🛑", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -57,11 +56,9 @@ public class WateringManager {
             switchOtomatis.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 isAutoActive = isChecked;
                 updateSwitchUI(switchOtomatis, isChecked, "#448AFF");
-                if (isChecked) {
-                    Toast.makeText(context, "Mode OTOMATIS Aktif 🤖", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Mode OTOMATIS Mati ❌", Toast.LENGTH_SHORT).show();
-                }
+                
+                // Update mode di sensor/mode jika diperlukan
+                pompaRef.getParent().child("mode").setValue(isChecked ? "Otomatis" : "Manual");
             });
         }
     }
@@ -76,14 +73,9 @@ public class WateringManager {
         if (!isAutoActive || switchSiram == null) return;
 
         if (soilValue < 60) {
-            if (!switchSiram.isChecked()) {
-                switchSiram.setChecked(true);
-            }
-        } 
-        else if (soilValue >= 60) {
-            if (switchSiram.isChecked()) {
-                switchSiram.setChecked(false);
-            }
+            if (!switchSiram.isChecked()) switchSiram.setChecked(true);
+        } else if (soilValue >= 80) {
+            if (switchSiram.isChecked()) switchSiram.setChecked(false);
         }
     }
 }
