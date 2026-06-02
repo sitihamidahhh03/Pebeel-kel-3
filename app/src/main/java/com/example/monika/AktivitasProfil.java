@@ -1,11 +1,14 @@
 package com.example.monika;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.Button;
@@ -19,6 +22,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.example.monika.ui.HeaderManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -52,11 +58,35 @@ public class AktivitasProfil extends AppCompatActivity {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
                     if (imageUri != null) {
-                        startCrop(imageUri);
+                        // 1. Salin foto dari galeri ke folder internal aplikasi dulu agar aman
+                        Uri localUri = copyToInternal(imageUri);
+                        if (localUri != null) {
+                            // 2. Baru panggil fungsi potong (Crop) menggunakan file lokal
+                            startCrop(localUri);
+                        }
                     }
                 }
             }
     );
+
+    private Uri copyToInternal(Uri uri) {
+        try {
+            File tempFile = new File(getCacheDir(), "temp_input.jpg");
+            InputStream is = getContentResolver().openInputStream(uri);
+            FileOutputStream os = new FileOutputStream(tempFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = is.read(buffer)) != -1) {
+                os.write(buffer, 0, read);
+            }
+            is.close();
+            os.close();
+            return FileProvider.getUriForFile(this, "com.syram.monika.fileprovider", tempFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     private final ActivityResultLauncher<Intent> cropImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -185,8 +215,7 @@ public class AktivitasProfil extends AppCompatActivity {
         builder.setTitle("Foto Profil");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                pickImageLauncher.launch(intent);
+                checkPermissionAndOpenGallery();
             } else if (which == 1) {
                 deleteProfilePhoto();
             }
@@ -194,30 +223,78 @@ public class AktivitasProfil extends AppCompatActivity {
         builder.show();
     }
 
-    private void startCrop(Uri uri) {
+    private void checkPermissionAndOpenGallery() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 101);
+            } else {
+                openGallery();
+            }
+        } else {
+            // Android 12 and below
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    private void openGallery() {
         try {
-            // Buat file sementara untuk menampung hasil crop agar lebih stabil di semua HP
-            File cropFile = new File(getFilesDir(), "temp_crop_" + System.currentTimeMillis() + ".jpg");
-            cropResultUri = Uri.fromFile(cropFile);
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            pickImageLauncher.launch(Intent.createChooser(intent, "Pilih Foto Profil"));
+        } catch (Exception e) {
+            Toast.makeText(this, "Akses galeri gagal: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 101) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGallery();
+            } else {
+                Toast.makeText(this, "Izin galeri ditolak. Silakan aktifkan di pengaturan HP.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void startCrop(Uri sourceUri) {
+        try {
+            // Buat file untuk menampung hasil potongan
+            File cropFile = new File(getFilesDir(), "profile_crop.jpg");
+            cropResultUri = FileProvider.getUriForFile(this, "com.syram.monika.fileprovider", cropFile);
 
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
-            cropIntent.setDataAndType(uri, "image/*");
+            cropIntent.setDataAndType(sourceUri, "image/*");
             cropIntent.putExtra("crop", "true");
             cropIntent.putExtra("aspectX", 1);
             cropIntent.putExtra("aspectY", 1);
             cropIntent.putExtra("outputX", 512);
             cropIntent.putExtra("outputY", 512);
-            cropIntent.putExtra("return-data", false); // Gunakan URI agar tidak pecah atau null
+            cropIntent.putExtra("scale", true);
+            cropIntent.putExtra("return-data", false);
             cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, cropResultUri);
             
-            // Berikan izin akses URI
-            cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            cropIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            // Berikan izin akses penuh agar aplikasi pemotong bisa membaca & menulis
+            cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             
+            // Berikan izin ke semua aplikasi yang mampu menangani intent ini
+            java.util.List<android.content.pm.ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(cropIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (android.content.pm.ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, cropResultUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                grantUriPermission(packageName, sourceUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             cropImageLauncher.launch(cropIntent);
         } catch (Exception e) {
-            // Jika fitur Crop sistem tidak tersedia, langsung simpan foto aslinya
-            saveImageToInternalStorage(uri);
+            // Jika fitur Crop benar-benar tidak ada di HP tersebut, langsung simpan foto aslinya
+            saveImageToInternalStorage(sourceUri);
         }
     }
 
