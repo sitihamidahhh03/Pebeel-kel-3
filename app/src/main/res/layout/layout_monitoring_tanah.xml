@@ -47,6 +47,59 @@
                 android:textColor="#2D3A29"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <!-- Container untuk status aktuator (Hanya muncul saat Manual) -->
+            <LinearLayout
+                android:id="@+id/layoutStatusManual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <!-- Indikator Pompa -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="12dp">
+                    <View
+                        android:id="@+id/dotPompa"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_dot_status" />
+                    <TextView
+                        android:id="@+id/tvStatusPompa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Siram"
+                        android:textSize="11sp"
+                        android:layout_marginStart="4dp"
+                        android:textColor="#757575"/>
+                </LinearLayout>
+
+                <!-- Indikator Kipas -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <View
+                        android:id="@+id/dotKipas"
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_dot_status" />
+                    <TextView
+                        android:id="@+id/tvStatusKipas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kipas"
+                        android:textSize="11sp"
+                        android:layout_marginStart="4dp"
+                        android:textColor="#757575"/>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <FrameLayout

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AppInsightsSettings">
+    <option name="selectedTabId" value="Firebase Crashlytics" />
     <option name="tabSettings">
       <map>
         <entry key="Firebase Crashlytics">
@@ -8,8 +9,8 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.monika" />
-                  <option name="mobileSdkAppId" value="1:527758994039:android:d745607254955e48907472" />
+                  <option name="appId" value="com.syram.monika" />
+                  <option name="mobileSdkAppId" value="1:527758994039:android:14c532cb4134a020907472" />
                   <option name="projectId" value="syram-iot" />
                   <option name="projectNumber" value="527758994039" />
                 </ConnectionSetting>

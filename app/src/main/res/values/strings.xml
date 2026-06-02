@@ -38,6 +38,7 @@
     <string name="label_month">Bulan Ini</string>
     <string name="label_year">Tahun Ini</string>
     <string name="grafik_subtitle">Data rata-rata kelembaban tanah</string>
+    <string name="hint_tap_graph">* Ketuk batang grafik untuk melihat detail data</string>
 
     <!-- 6. Halaman Profil -->
     <string name="title_profil">Profil Pengguna</string>
