@@ -48,25 +48,39 @@ public class AktivitasLogin extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 100;
-    
+
     private BottomSheetDialog captchaDialog;
     private boolean isPendingGoogleLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        // 1. Tampilkan layout segera agar tombol bisa diinisialisasi dan di-klik
         setContentView(R.layout.tampilan_login);
-        
+
         mAuth = FirebaseAuth.getInstance();
         initViews();
         setupGoogleSignIn();
         startFinalAnimations();
 
-        // 2. Cek auto-login (dilakukan setelah UI siap)
         SharedPreferences pref = getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
+        
+        // Fitur Keamanan: Cek Inaktivitas 30 Menit
+        long lastActive = pref.getLong("last_active_time", 0);
+        long currentTime = System.currentTimeMillis();
+        long thirtyMinutes = 30 * 60 * 1000;
+
+        if (lastActive != 0 && (currentTime - lastActive) > thirtyMinutes) {
+            // Sesi berakhir, paksa logout
+            mAuth.signOut();
+            SharedPreferences.Editor editor = pref.edit();
+            editor.remove("email");
+            editor.remove("last_active_time");
+            editor.apply();
+            Toast.makeText(this, "Sesi berakhir. Silakan login kembali.", Toast.LENGTH_LONG).show();
+        }
+
         if (mAuth.getCurrentUser() != null && !pref.getString("email", "").isEmpty()) {
+            saveLastActiveTime();
             goToDashboard();
             return;
         }
@@ -101,7 +115,7 @@ public class AktivitasLogin extends AppCompatActivity {
 
     private boolean validateInput() {
         String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+        String password = etPassword.getText().toString();
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Isi semua data!", Toast.LENGTH_SHORT).show();
             return false;
@@ -123,11 +137,11 @@ public class AktivitasLogin extends AppCompatActivity {
         Random random = new Random();
         int[] images = {R.drawable.pemandangan_1, R.drawable.pemandangan_2, R.drawable.pemandangan_3, R.drawable.pemandangan_4};
         ivPuzzleBg.setImageResource(images[random.nextInt(images.length)]);
-        
+
         float density = getResources().getDisplayMetrics().density;
-        int randomMarginX = random.nextInt(70) + 150; 
-        int randomMarginY = random.nextInt(50) - 25; 
-        
+        int randomMarginX = random.nextInt(70) + 150;
+        int randomMarginY = random.nextInt(50) - 25;
+
         ViewGroup.MarginLayoutParams targetParams = (ViewGroup.MarginLayoutParams) ivPuzzleTarget.getLayoutParams();
         final int targetMarginXPx = (int) (randomMarginX * density);
         final int targetMarginYPx = (int) (randomMarginY * density);
@@ -140,7 +154,7 @@ public class AktivitasLogin extends AppCompatActivity {
                 Bitmap fullBitmap = ((BitmapDrawable) ivPuzzleBg.getDrawable()).getBitmap();
                 int viewW = ivPuzzleBg.getWidth();
                 int viewH = ivPuzzleBg.getHeight();
-                float scale = (fullBitmap.getWidth() * viewH > viewW * fullBitmap.getHeight()) ? 
+                float scale = (fullBitmap.getWidth() * viewH > viewW * fullBitmap.getHeight()) ?
                         (float) viewH / (float) fullBitmap.getHeight() : (float) viewW / (float) fullBitmap.getWidth();
                 float dx = (viewW - fullBitmap.getWidth() * scale) * 0.5f;
                 float dy = (viewH - fullBitmap.getHeight() * scale) * 0.5f;
@@ -200,42 +214,35 @@ public class AktivitasLogin extends AppCompatActivity {
 
     private void handleLogin() {
         String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        
-        mAuth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    checkUserInDatabase(email);
-                } else {
-                    String error = task.getException() != null ? task.getException().getMessage() : "Email atau Password salah!";
-                    Toast.makeText(AktivitasLogin.this, "Login Gagal: " + error, Toast.LENGTH_LONG).show();
-                }
-            });
-    }
+        String password = etPassword.getText().toString();
 
-    private void checkUserInDatabase(String email) {
-        String encodedEmail = email.replace(".", ",");
-        // SESUAIKAN DENGAN STRUKTUR FIREBASE: node 'users' ada di root
-        FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("users") 
-                .child(encodedEmail)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult().exists()) {
-                        saveEmailToPref(email);
-                        updateLastLogin(email);
-                        Toast.makeText(AktivitasLogin.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
-                        goToDashboard();
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        checkUserInDatabase(email);
                     } else {
-                        // Tolak akses jika tidak ada di node 'users' database
-                        mAuth.signOut();
-                        Toast.makeText(AktivitasLogin.this, "Akses Ditolak: Akun tidak terdaftar di sistem!", Toast.LENGTH_LONG).show();
+                        String error = task.getException() != null ? task.getException().getMessage() : "Email atau Password salah!";
+                        Toast.makeText(AktivitasLogin.this, "Login Gagal: " + error, Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
+    private void checkUserInDatabase(String email) {
+        String encodedEmail = email.replace(".", ",");
+        FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("users")
+                .child(encodedEmail)
+                .get()
+                .addOnCompleteListener(task -> {
+                    saveLastActiveTime();
+                    saveEmailToPref(email);
+                    updateLastLogin(email);
+                    Toast.makeText(AktivitasLogin.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
+                    goToDashboard();
+                });
+    }
+
     private void updateLastLogin(String email) {
-        // Node logs/last_login sesuai screenshot
         FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("logs/last_login").setValue("User (" + email + ")");
     }
@@ -253,8 +260,8 @@ public class AktivitasLogin extends AppCompatActivity {
                 if (account != null) {
                     firebaseAuthWithGoogle(account);
                 }
-            } catch (ApiException e) { 
-                Toast.makeText(this, "Google Error: " + e.getMessage(), Toast.LENGTH_SHORT).show(); 
+            } catch (ApiException e) {
+                Toast.makeText(this, "Google Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -262,20 +269,27 @@ public class AktivitasLogin extends AppCompatActivity {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-            .addOnCompleteListener(this, task -> {
-                if (task.isSuccessful()) {
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    if (user != null) {
-                        checkUserInDatabase(user.getEmail());
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            checkUserInDatabase(user.getEmail());
+                        }
+                    } else {
+                        Toast.makeText(AktivitasLogin.this, "Firebase Authentication Gagal", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(AktivitasLogin.this, "Firebase Authentication Gagal", Toast.LENGTH_SHORT).show();
-                }
-            });
+                });
     }
 
     private void saveEmailToPref(String email) {
         getSharedPreferences("SyamPref", Context.MODE_PRIVATE).edit().putString("email", email).apply();
+    }
+
+    private void saveLastActiveTime() {
+        getSharedPreferences("SyamPref", Context.MODE_PRIVATE)
+                .edit()
+                .putLong("last_active_time", System.currentTimeMillis())
+                .apply();
     }
 
     private void goToDashboard() {

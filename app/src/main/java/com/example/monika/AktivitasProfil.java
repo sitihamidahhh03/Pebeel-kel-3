@@ -1,7 +1,6 @@
 package com.example.monika;
 
-import android.content.Context;
-import android.content.Intent;
+import android.content.Context;import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.example.monika.ui.HeaderManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -43,13 +43,17 @@ public class AktivitasProfil extends AppCompatActivity {
     private DatabaseReference userRef;
     private FirebaseAuth mAuth;
     private DatabaseHelper dbHelper;
+    private Uri tempImageUri;
+    private Uri cropResultUri;
 
     private final ActivityResultLauncher<Intent> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri imageUri = result.getData().getData();
-                    startCrop(imageUri);
+                    tempImageUri = result.getData().getData();
+                    if (tempImageUri != null) {
+                        showCropOptionDialog(tempImageUri);
+                    }
                 }
             }
     );
@@ -57,16 +61,23 @@ public class AktivitasProfil extends AppCompatActivity {
     private final ActivityResultLauncher<Intent> cropImageLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Bundle extras = result.getData().getExtras();
-                    if (extras != null) {
-                        Bitmap bitmap = extras.getParcelable("data");
-                        if (bitmap != null) {
-                            saveBitmapToInternalStorage(bitmap);
-                        } else {
-                            Uri croppedUri = result.getData().getData();
-                            if (croppedUri != null) saveImageToInternalStorage(croppedUri);
+                if (result.getResultCode() == RESULT_OK) {
+                    boolean savedFromCrop = false;
+                    if (cropResultUri != null) {
+                        File cropFile = new File(getCacheDir(), "crop_output.jpg");
+                        if (cropFile.exists() && cropFile.length() > 0) {
+                            saveImageToInternalStorage(cropResultUri);
+                            savedFromCrop = true;
                         }
+                    }
+                    if (!savedFromCrop && tempImageUri != null) {
+                        saveImageToInternalStorage(tempImageUri);
+                    }
+                } else {
+                    // Jika crop dibatalkan, tetap simpan foto asli
+                    if (tempImageUri != null) {
+                        saveImageToInternalStorage(tempImageUri);
+                        Toast.makeText(this, "Foto asli disimpan (tanpa crop)", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -81,14 +92,13 @@ public class AktivitasProfil extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         SharedPreferences pref = getSharedPreferences("SyamPref", Context.MODE_PRIVATE);
         userEmail = pref.getString("email", "");
-        
+
         if (userEmail.isEmpty()) {
             finish();
             return;
         }
 
         String encodedEmail = userEmail.replace(".", ",");
-        // DISESUAIKAN: Path lowercase 'users'
         userRef = FirebaseDatabase.getInstance("https://syram-iot-default-rtdb.asia-southeast1.firebasedatabase.app/")
                 .getReference("users").child(encodedEmail);
 
@@ -120,7 +130,7 @@ public class AktivitasProfil extends AppCompatActivity {
             SharedPreferences.Editor editor = pref.edit();
             editor.clear();
             editor.apply();
-            
+
             Intent intent = new Intent(AktivitasProfil.this, AktivitasLogin.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -135,16 +145,42 @@ public class AktivitasProfil extends AppCompatActivity {
         }
         File imgFile = new File(path);
         if (imgFile.exists()) {
-            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-            if (myBitmap != null) {
-                ivFotoProfil.setImageBitmap(myBitmap);
-                ivFotoProfil.setImageTintList(null);
-            } else {
+            try {
+                // Downsampling untuk menghindari OutOfMemory pada gambar besar
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+
+                options.inSampleSize = calculateInSampleSize(options, 512, 512);
+                options.inJustDecodeBounds = false;
+
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+                if (myBitmap != null) {
+                    ivFotoProfil.setImageBitmap(myBitmap);
+                    ivFotoProfil.setImageTintList(null);
+                } else {
+                    ivFotoProfil.setImageResource(R.drawable.ic_account_circle);
+                }
+            } catch (Exception e) {
                 ivFotoProfil.setImageResource(R.drawable.ic_account_circle);
             }
         } else {
             ivFotoProfil.setImageResource(R.drawable.ic_account_circle);
         }
+    }
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
     }
 
     private void loadUserData() {
@@ -183,8 +219,27 @@ public class AktivitasProfil extends AppCompatActivity {
         builder.show();
     }
 
+    private void showCropOptionDialog(Uri uri) {
+        String[] options = {"Potong Foto (Crop)", "Gunakan Langsung"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Opsi Foto");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                startCrop(uri);
+            } else {
+                saveImageToInternalStorage(uri);
+            }
+        });
+        builder.setCancelable(false);
+        builder.show();
+    }
+
     private void startCrop(Uri uri) {
         try {
+            File cropFile = new File(getCacheDir(), "crop_output.jpg");
+            if (cropFile.exists()) cropFile.delete();
+            cropResultUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", cropFile);
+
             Intent cropIntent = new Intent("com.android.camera.action.CROP");
             cropIntent.setDataAndType(uri, "image/*");
             cropIntent.putExtra("crop", "true");
@@ -192,7 +247,12 @@ public class AktivitasProfil extends AppCompatActivity {
             cropIntent.putExtra("aspectY", 1);
             cropIntent.putExtra("outputX", 512);
             cropIntent.putExtra("outputY", 512);
-            cropIntent.putExtra("return-data", true);
+            cropIntent.putExtra("scale", true);
+            cropIntent.putExtra("return-data", false);
+            cropIntent.putExtra(MediaStore.EXTRA_OUTPUT, cropResultUri);
+            cropIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            cropIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
             cropImageLauncher.launch(cropIntent);
         } catch (Exception e) {
             saveImageToInternalStorage(uri);
@@ -217,6 +277,7 @@ public class AktivitasProfil extends AppCompatActivity {
             if (!newName.isEmpty()) {
                 userRef.child("name").setValue(newName);
                 dbHelper.updateUserName(userEmail, newName);
+                tvNamaUser.setText(newName);
                 Toast.makeText(this, "Nama diperbarui", Toast.LENGTH_SHORT).show();
             }
         });
@@ -224,12 +285,21 @@ public class AktivitasProfil extends AppCompatActivity {
         builder.show();
     }
 
-    private void saveBitmapToInternalStorage(Bitmap bitmap) {
+    private void saveImageToInternalStorage(Uri uri) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
         try {
+            inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream == null) return;
+
             File file = new File(getFilesDir(), "profile_" + System.currentTimeMillis() + ".jpg");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream);
-            outputStream.close();
+            outputStream = new FileOutputStream(file);
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, read);
+            }
+
             String photoPath = file.getAbsolutePath();
             userRef.child("photo_path").setValue(photoPath);
             dbHelper.updateUserPhoto(userEmail, photoPath);
@@ -238,29 +308,11 @@ public class AktivitasProfil extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void saveImageToInternalStorage(Uri uri) {
-        try {
-            InputStream inputStream = getContentResolver().openInputStream(uri);
-            File file = new File(getFilesDir(), "profile_" + System.currentTimeMillis() + ".jpg");
-            FileOutputStream outputStream = new FileOutputStream(file);
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-            inputStream.close();
-            outputStream.close();
-            String photoPath = file.getAbsolutePath();
-            userRef.child("photo_path").setValue(photoPath);
-            dbHelper.updateUserPhoto(userEmail, photoPath);
-            setProfileImage(photoPath);
-            Toast.makeText(this, "Foto profil diperbarui", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Gagal memuat foto", Toast.LENGTH_SHORT).show();
+        } finally {
+            try {
+                if (inputStream != null) inputStream.close();
+                if (outputStream != null) outputStream.close();
+            } catch (Exception ignored) {}
         }
     }
 }
