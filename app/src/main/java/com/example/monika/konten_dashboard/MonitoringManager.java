@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -71,11 +74,23 @@ public class MonitoringManager {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "SYRAM Notifications",
                     NotificationManager.IMPORTANCE_HIGH
             );
+            channel.setDescription("Channel untuk peringatan kelembaban tanah");
+            
+            // Set sound untuk channel
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+            channel.setSound(soundUri, audioAttributes);
+            channel.enableVibration(true);
+
             NotificationManager manager = activity.getSystemService(NotificationManager.class);
             if (manager != null) manager.createNotificationChannel(channel);
         }
@@ -175,12 +190,16 @@ public class MonitoringManager {
         PendingIntent pi = PendingIntent.getActivity(activity, status.hashCode(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(activity, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setSound(soundUri) // Untuk Android di bawah Oreo
+                .setVibrate(new long[]{0, 500, 200, 500})
                 .setContentIntent(pi)
                 .setAutoCancel(true);
 

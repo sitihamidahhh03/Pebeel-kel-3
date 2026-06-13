@@ -61,16 +61,27 @@ public class HeaderManager {
         String email = pref.getString("email", "");
         
         if (!email.isEmpty()) {
+            // 1. Coba ambil dari Database Lokal (SQLite) dulu agar cepat
             String photoPath = dbHelper.getUserPhoto(email);
+            
+            // 2. Jika di SQLite kosong, coba cari di SharedPreferences
+            if (photoPath == null || photoPath.isEmpty()) {
+                photoPath = pref.getString("profile_path_" + email, null);
+            }
+
             if (photoPath != null && !photoPath.isEmpty()) {
                 File imgFile = new File(photoPath);
                 if (imgFile.exists()) {
                     try {
-                        // Gunakan BitmapFactory agar lebih stabil memuat file lokal di ImageView
-                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                        // Optimalkan pemuatan gambar agar tidak lambat/berat
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 2; // Perkecil resolusi untuk ikon kecil di header
+                        Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath(), options);
+                        
                         if (bitmap != null) {
                             ivProfile.setImageBitmap(bitmap);
-                            ivProfile.setImageTintList(null); // Penting: hapus tint placeholder
+                            ivProfile.setImageTintList(null); // Hapus warna filter default
+                            ivProfile.setScaleType(ImageView.ScaleType.CENTER_CROP); // Agar foto memenuhi lingkaran
                             return;
                         }
                     } catch (Exception e) {
@@ -79,7 +90,7 @@ public class HeaderManager {
                 }
             }
         }
-        // Fallback ke ikon default jika gagal atau tidak ada foto
+        // Fallback: Tampilkan ikon default jika gagal
         ivProfile.setImageResource(R.drawable.ic_account_circle);
     }
 

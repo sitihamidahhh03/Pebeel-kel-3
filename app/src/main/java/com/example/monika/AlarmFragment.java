@@ -33,7 +33,7 @@ public class AlarmFragment extends Fragment {
                     if (index == -1) {
                         tambahAlarm(time, label);
                     } else {
-                        updateAlarm(index, time, label);
+                        updateAlarmUI(index, time, label);
                     }
                 }
             }
@@ -55,10 +55,40 @@ public class AlarmFragment extends Fragment {
             });
         }
 
+        // LOAD DATA YANG TERSIMPAN
+        loadSavedAlarms();
+
         return view;
     }
 
+    private void loadSavedAlarms() {
+        if (getContext() == null || containerAlarm == null) return;
+        containerAlarm.removeAllViews();
+        java.util.List<AlarmModel> savedList = AlarmRepository.getAlarms(getContext());
+        for (AlarmModel alarm : savedList) {
+            addAlarmView(alarm.getTime(), alarm.getLabel());
+        }
+    }
+
     private void tambahAlarm(String time, String label) {
+        if (getContext() == null) return;
+        
+        // Simpan ke Repository
+        int hour = 0, minute = 0;
+        try {
+            String[] parts = time.split(":");
+            hour = Integer.parseInt(parts[0]);
+            minute = Integer.parseInt(parts[1]);
+        } catch (Exception ignored) {}
+        
+        AlarmModel newAlarm = new AlarmModel(time.hashCode(), hour, minute, label, true);
+        AlarmRepository.addAlarm(getContext(), newAlarm);
+        
+        // Tampilkan di UI
+        addAlarmView(time, label);
+    }
+
+    private void addAlarmView(String time, String label) {
         if (getContext() == null) return;
 
         LinearLayout item = new LinearLayout(getContext());
@@ -80,11 +110,11 @@ public class AlarmFragment extends Fragment {
         TextView tvTime = new TextView(getContext());
         tvTime.setText(time);
         tvTime.setTextSize(18);
-        tvTime.setTextColor(getResources().getColor(android.R.color.white));
+        tvTime.setTextColor(androidx.core.content.ContextCompat.getColor(getContext(), android.R.color.white));
 
         TextView tvLabel = new TextView(getContext());
         tvLabel.setText(label);
-        tvLabel.setTextColor(getResources().getColor(android.R.color.white));
+        tvLabel.setTextColor(androidx.core.content.ContextCompat.getColor(getContext(), android.R.color.white));
 
         textContainer.addView(tvTime);
         textContainer.addView(tvLabel);
@@ -109,7 +139,9 @@ public class AlarmFragment extends Fragment {
 
             dialogView.findViewById(R.id.btnNo).setOnClickListener(v1 -> dialog.dismiss());
             dialogView.findViewById(R.id.btnYes).setOnClickListener(v1 -> {
+                int index = containerAlarm.indexOfChild(item);
                 AlarmManagerHelper.hapusAlarm(getContext(), time);
+                AlarmRepository.removeAlarm(getContext(), index);
                 containerAlarm.removeView(item);
                 dialog.dismiss();
             });
@@ -130,9 +162,20 @@ public class AlarmFragment extends Fragment {
         containerAlarm.addView(item);
     }
 
-    private void updateAlarm(int index, String time, String label) {
-        if (index < 0 || index >= containerAlarm.getChildCount()) return;
+    private void updateAlarmUI(int index, String time, String label) {
+        if (getContext() == null || index < 0 || index >= containerAlarm.getChildCount()) return;
 
+        // Update di Repository
+        int hour = 0, minute = 0;
+        try {
+            String[] parts = time.split(":");
+            hour = Integer.parseInt(parts[0]);
+            minute = Integer.parseInt(parts[1]);
+        } catch (Exception ignored) {}
+        AlarmModel updatedAlarm = new AlarmModel(time.hashCode(), hour, minute, label, true);
+        AlarmRepository.updateAlarm(getContext(), index, updatedAlarm);
+
+        // Update di UI
         LinearLayout item = (LinearLayout) containerAlarm.getChildAt(index);
         LinearLayout textContainer = (LinearLayout) item.getChildAt(0);
 
